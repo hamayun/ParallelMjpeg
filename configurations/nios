@@ -1,0 +1,26 @@
+export TARGET_PREFIX="$PWD/build-nios"
+
+export TARGET_CAL="ALTERA_NIOS_2_FAST"
+export TARGET_SYSTEM_KSP_OS="SYSTEM_KSP_OS_DNA"
+export TARGET_SYSTEM_KSP_TASK="SYSTEM_KSP_TASK_PTHREAD"
+export TARGET_SYSTEM_ASP_C=""
+export TARGET_SYSTEM_ASP_M=""
+export TARGET_SYSTEM_ASP_COM="SYSTEM_ASP_COM_KPN"
+export TARGET_SYSTEM_SSP_CAL="SYSTEM_SSP_CAL_${TARGET_CAL}"
+export TARGET_SYSTEM_SSP_PAL="SYSTEM_SSP_PAL_SOCLIB"
+export TARGET_SYSTEM_LIBS="${TARGET_SYSTEM_SSP_CAL} ${TARGET_SYSTEM_KSP_OS} ${TARGET_SYSTEM_ASP_COM} ${TARGET_SYSTEM_KSP_TASK} ${TARGET_SYSTEM_ASP_C} ${TARGET_SYSTEM_ASP_M}"  
+
+export DNA_CORE_SERVICES="base event exception interrupt lock team thread vpu"
+export DNA_CFLAGS="-DDNA_PARANOID_CHECK -DDNA_ENABLE_TRACE -DDNA_DISABLE_CLOCK" # -DDNA_ENABLE_PINPOINTING"
+
+export DNA_DEVICES="soclib_tty channel_rendezvous"
+export DNA_FILESYSTEMS="devfs bridgefs"
+
+export TARGET_CC="nios2-sls-dnaos-gcc"
+export TARGET_CFLAGS="-pipe -ggdb -G0 -O3 -std=c99 -Wall -DPROGRESS"
+export TARGET_LD="nios2-sls-dnaos-gcc"
+export TARGET_LDFLAGS=""
+export TARGET_ARFLAGS="cru"
+export TARGET_AR="nios2-sls-dnaos-ar"
+export TARGET_RANLIB="nios2-sls-dnaos-ranlib"
+export TARGET_LDSCRIPT="-T ./ldscripts/nios2"

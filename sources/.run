@@ -1,0 +1,4 @@
+
+# Start running noodle version 07Q2 7.29.23, Mon Jan 14 17:00:51 2008
+
+noodle -B +F -I/opt/tct/magic-07Q2/designs/magic/lib -D__chess__ -I../headers -I/home/xguerin/Workspace/APES/system/ksp/os/dna/headers -I/home/xguerin/Workspace/APES/system/ksp/task/dol/headers -I/home/xguerin/Workspace/APES/system/asp/com/dol/headers -I/home/xguerin/Workspace/APES/system/ssp/cal/atmel/magicv/headers -I/home/xguerin/Workspace/APES/system/ssp/pal/atmd940/headers -I/home/xguerin/Workspace/APES/system/asp/c/elibc/headers -I/opt/tct/magic-07Q2/designs/magic/lib/../cinclude/DBios -I/opt/tct/magic-07Q2/designs/magic/lib/../cinclude/stdlib -I/opt/tct/magic-07Q2/designs/magic/lib/../cinclude/DSPlib -I/opt/tct/magic-07Q2/designs/magic/lib/../cinclude/mathlib -D__SYSTEM_RAM__=0x20100000 -imagic_chess.h +u +Olp=EXT_DATA +Olp=EXT_DATAb +NOrm +c +u +Oextc +Sax +Sca +Srld +NOopt +Vdo +Vind +Vinl +Vlbb +Vrew +w/tmp arm.c magic 
