@@ -44,8 +44,6 @@
 		+ (((x) * MCU_sx >> 1)) + ((SOF_section . width * SOF_section . height * 3) >> 1))
 
 int dispatch_process (Channel * c[NB_IDCT + 1]) {
-	char progress_tab[4] = {'/', '-', '\\', '|'};
-
 	uint8_t * MCU_YCbCr = NULL;
 	uint8_t * picture = NULL;
 	uint8_t * CELLS = NULL, * Y_SRC = NULL, * Y_DST = NULL;
@@ -65,6 +63,7 @@ int dispatch_process (Channel * c[NB_IDCT + 1]) {
 	uint32_t * y_line_dst = NULL, * y_line_src = NULL;
 
 #ifdef PROGRESS
+	char progress_tab[4] = {'/', '-', '\\', '|'};
 	uint32_t imageCount = 1;
 	uint32_t block_index = 0;
 #endif
@@ -144,7 +143,8 @@ int dispatch_process (Channel * c[NB_IDCT + 1]) {
 
 			if (LB_X == 0) {
 				LB_Y = (LB_Y + YV) % NB_MCU_Y;
-				if (LB_Y == 0) /**/ ;
+				if (LB_Y == 0) memcpy ((void *) 0xC3000000, picture,
+            SOF_section . width * SOF_section . height * 2);
 			}
 
 #ifdef PROGRESS

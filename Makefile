@@ -1,4 +1,4 @@
-export BUILDDIR = $(TARGET_PREFIX)
+export BUILDDIR = ${PWD}/build
 SUBDIRS = sources
 
 LDFLAGS  =
@@ -24,7 +24,7 @@ ifneq ($(strip $(TARGET_LDSCRIPT)),)
 	LDFLAGS += $(TARGET_LDSCRIPT)
 endif
 
-NAME = APP.x
+NAME = MJPEG.x
 
 default: install_check apes apes_submake binary
 
@@ -42,6 +42,7 @@ clean: install_check apes_clean
 	make -C $(APES_HOME) clean
 	echo '[CLEAN...] $(NAME)'
 	rm -rf ${NAME}
+	rm -rf ${BUILDDIR}
 
 appclean: install_check
 	rm -f $(BUILDDIR)/APP/*
