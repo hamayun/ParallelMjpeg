@@ -137,7 +137,8 @@ int dispatch_process (Channel * c[NB_IDCT + 1]) {
 			LB_X = (LB_X + YH) % NB_MCU_X;
 
 #ifdef PROGRESS
-			printf ("\033[1D%c", progress_tab[block_index++ % 4]);
+			fputs ("\033[1D", stdout);
+			putchar (progress_tab[block_index++ % 4]);
 			fflush (stdout);
 #endif
 
@@ -149,7 +150,7 @@ int dispatch_process (Channel * c[NB_IDCT + 1]) {
 
 #ifdef PROGRESS
 			if (LB_X == 0 && LB_Y == 0) {
-				printf ("\033[1Ddone\n");
+				puts ("\033[1Ddone");
 				printf ("Image %lu : |", imageCount++);
 				fflush (stdout);
 			}
