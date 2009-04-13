@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <math.h>
 
-#include <pthread.h>
-#include <dpn.h>
+#include <PosixThreads/PosixThreads.h>
+#include <KahnProcessNetwork/KahnProcessNetwork.h>
 
 #include "mjpeg.h"
 

@@ -3,14 +3,16 @@
 
 #include <stdint.h>
 #include <stdlib.h>
-#include <vfs/vfs.h>
-#include <libos/libos.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <cpu.h>
 
 #include "mjpeg.h"
 #include "utils.h"
+
+#include <VirtualFileSystemManager/VirtualFileSystemManager.h>
+#include <DnaInterface/DnaInterface.h>
+#include <DnaTools/DnaTools.h>
 
 enum fdaccess_control
 {

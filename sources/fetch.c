@@ -25,7 +25,7 @@
 #include <stdbool.h>
 #include <malloc.h>
 
-#include <dpn.h>
+#include <KahnProcessNetwork/KahnProcessNetwork.h>
 
 #include "fetch.h"
 #include "utils.h"

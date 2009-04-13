@@ -25,7 +25,8 @@
 #include <string.h>
 #include <malloc.h>
 #include <sys/times.h>
-#include <dpn.h>
+
+#include <KahnProcessNetwork/KahnProcessNetwork.h>
 
 #include "mjpeg.h"
 #include "utils.h"
