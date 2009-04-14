@@ -3,10 +3,10 @@
 #include <stdio.h>
 #include <math.h>
 
+#include <Private/mjpeg.h>
+
 #include <PosixThreads/PosixThreads.h>
 #include <KahnProcessNetwork/KahnProcessNetwork.h>
-
-#include "mjpeg.h"
 
 extern void * fetch_process (void * c);
 extern void * idct_process (void * c);

@@ -24,7 +24,7 @@
 #ifndef __MJPEG_H__
 #define __MJPEG_H__
 
-#include "jpeg.h"
+#include <Private/jpeg.h>
 
 #define NB_IDCT			3
 

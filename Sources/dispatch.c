@@ -26,10 +26,10 @@
 #include <malloc.h>
 #include <sys/times.h>
 
-#include <KahnProcessNetwork/KahnProcessNetwork.h>
+#include <Private/mjpeg.h>
+#include <Private/utils.h>
 
-#include "mjpeg.h"
-#include "utils.h"
+#include <KahnProcessNetwork/KahnProcessNetwork.h>
 
 #define MCU_INDEX(ptr, index) (ptr + ((index) * MCU_sx * MCU_sy))
 #define MCU_LINE(ptr,n) (ptr + ((n) * MCU_sx))

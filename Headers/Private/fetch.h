@@ -6,8 +6,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#include "mjpeg.h"
-#include "utils.h"
+#include <Private/mjpeg.h>
+#include <Private/utils.h>
 
 #include <VirtualFileSystemManager/VirtualFileSystemManager.h>
 #include <DnaInterface/DnaInterface.h>
@@ -61,7 +61,7 @@ enum fdaccess_control
 #define INITIALIZE_MOVIE_DATA																\
   int32_t retval = 0;                     \
 	movie = open ("/devices/fdaccess", O_RDWR);  \
-  vfs_component . operation . ioctl (movie, FD_OPEN, "movie.mjpeg", & retval);\
+  vfs_ioctl (movie, FD_OPEN, "movie.mjpeg", & retval);\
   if (retval < 0) printf ("Error opening the video file.\r\n");
 #endif
 

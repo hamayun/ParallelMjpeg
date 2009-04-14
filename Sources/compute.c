@@ -24,11 +24,11 @@
 #include <string.h>
 #include <malloc.h>
 
-#include <KahnProcessNetwork/KahnProcessNetwork.h>
+#include <Private/compute.h>
+#include <Private/mjpeg.h>
+#include <Private/utils.h>
 
-#include "compute.h"
-#include "mjpeg.h"
-#include "utils.h"
+#include <KahnProcessNetwork/KahnProcessNetwork.h>
 
 int idct_process (Channel * c[2]) {
 	uint8_t * Idct_YCbCr;

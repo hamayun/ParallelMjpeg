@@ -25,11 +25,12 @@
 #include <stdbool.h>
 #include <malloc.h>
 
+#include <Private/fetch.h>
+#include <Private/utils.h>
+#include <Private/mjpeg.h> 
+
 #include <KahnProcessNetwork/KahnProcessNetwork.h>
 
-#include "fetch.h"
-#include "utils.h"
-#include "mjpeg.h" 
 /*---- Localy used variables ----*/
 const uint8_t G_ZZ[64] = {
     0, 1, 8, 16, 9, 2, 3, 10,
