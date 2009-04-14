@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <cpu.h>
 
 #include "mjpeg.h"
 #include "utils.h"
@@ -13,6 +12,7 @@
 #include <VirtualFileSystemManager/VirtualFileSystemManager.h>
 #include <DnaInterface/DnaInterface.h>
 #include <DnaTools/DnaTools.h>
+#include <Processor/Processor.h>
 
 enum fdaccess_control
 {
@@ -76,7 +76,7 @@ static inline void skip_segment(int16_t movie) {
 
 	NEXT_TOKEN(u . size[0]);
 	NEXT_TOKEN(u . size[1]);
-	CPU_DATA_IS_BIGENDIAN(16, u . segment_size);
+	cpu_data_is_bigendian(16, u . segment_size);
 
 	IPRINTF("Skip segment (%d data)\r\n",(unsigned int) u . segment_size);
 	SKIP(u . segment_size - 2); 
