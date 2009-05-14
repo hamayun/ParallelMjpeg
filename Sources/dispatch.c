@@ -1,9 +1,12 @@
-/*************************************************************************************
+/*
  * File   : libu.c, file for JPEG-JFIF Multi-thread decoder    
  *
  * Copyright (C) 2007 TIMA Laboratory
- * Author(s) :  Alexandre Chagoya, alexandre.chagoya-garzon@imag.fr (dol porting)    
- *              Patrice, GERIN patrice.gerin@imag.fr
+ *
+ * Author(s) :
+ *            Patrice GERIN, patrice.gerin@imag.fr
+ *            Xavier GUERIN, xavier.guerin@imag.fr
+ *
  * Bug Fixer(s) :   
  *
  * This program is free software; you can redistribute it and/or
@@ -20,7 +23,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- *************************************************************************************/
+ */
+
 #include <stdio.h>
 #include <string.h>
 #include <malloc.h>
@@ -67,6 +71,7 @@ int dispatch_process (Channel * c[NB_IDCT + 1]) {
 	char progress_tab[4] = {'/', '-', '\\', '|'};
 	uint32_t imageCount = 1;
 	uint32_t block_index = 0;
+  struct tms time_start, time_end;
 #endif
 
 	SOF_section_t SOF_section;
@@ -91,6 +96,7 @@ int dispatch_process (Channel * c[NB_IDCT + 1]) {
 	NB_MCU = NB_MCU_Y * NB_MCU_X;
 
 #ifdef PROGRESS
+  times (& time_start);
 	printf ("Image %lu : |", imageCount++);
 	fflush (stdout);
 #endif
@@ -152,6 +158,12 @@ int dispatch_process (Channel * c[NB_IDCT + 1]) {
 #ifdef PROGRESS
 			if (LB_X == 0 && LB_Y == 0) {
 				puts ("\033[1Ddone");
+
+        times (& time_end);
+        printf ("Time: %ld ns\r\n", (uint32_t)(time_end . tms_stime
+              - time_start . tms_stime));
+        time_start = time_end;
+
 				printf ("Image %lu : |", imageCount++);
 				fflush (stdout);
 			}
