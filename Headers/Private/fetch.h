@@ -10,8 +10,7 @@
 #include <Private/utils.h>
 
 #include <VirtualFileSystemManager/VirtualFileSystemManager.h>
-#include <DnaInterface/DnaInterface.h>
-#include <DnaTools/DnaTools.h>
+#include <DnaLibrary/DnaLibrary.h>
 #include <Processor/Processor.h>
 
 enum fdaccess_control

@@ -71,6 +71,9 @@ int dispatch_process (Channel * c[NB_IDCT + 1]) {
 	char progress_tab[4] = {'/', '-', '\\', '|'};
 	uint32_t imageCount = 1;
 	uint32_t block_index = 0;
+#endif
+
+#ifdef TIME
   struct tms time_start, time_end;
 #endif
 
@@ -96,9 +99,12 @@ int dispatch_process (Channel * c[NB_IDCT + 1]) {
 	NB_MCU = NB_MCU_Y * NB_MCU_X;
 
 #ifdef PROGRESS
-  times (& time_start);
 	printf ("Image %lu : |", imageCount++);
 	fflush (stdout);
+#endif
+
+#ifdef TIME
+  times (& time_start);
 #endif
 
 	while (1) {
@@ -155,19 +161,23 @@ int dispatch_process (Channel * c[NB_IDCT + 1]) {
             SOF_section . width * SOF_section . height * 2);
 			}
 
-#ifdef PROGRESS
 			if (LB_X == 0 && LB_Y == 0) {
+#ifdef PROGRESS
 				puts ("\033[1Ddone");
+#endif
 
+#ifdef TIME
         times (& time_end);
         printf ("Time: %ld ns\r\n", (uint32_t)(time_end . tms_stime
               - time_start . tms_stime));
         time_start = time_end;
+#endif
 
+#ifdef PROGRESS
 				printf ("Image %lu : |", imageCount++);
 				fflush (stdout);
-			}
 #endif
+			}
 		}
 	}
 
