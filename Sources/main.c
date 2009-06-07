@@ -45,15 +45,14 @@ int main (void) {
 
 	for (uint32_t i = 0; i < NB_IDCT; i++) {
 		pthread_attr_init (& idctAttr[i]);
-		// idctAttr[i] . procid = i;
-  	//	pthread_create (& idctThread[i], & idctAttr[i], idct_process, idct_channel[i]);
 	  sprintf(buffer,"idct.%lu", i + 1);
+		//  idctAttr[i] . procid = i;
 		idctAttr[i] . name = buffer;
   	pthread_create (& idctThread[i], & idctAttr[i], idct_process, idct_channel[i]);
 	}
 
 	pthread_attr_init (& fetchAttr);
-	//	fetchAttr . procid = 0;
+	//  fetchAttr . procid = 3;
 	fetchAttr . name = "fetch";
 
 	pthread_attr_init (& dispatchAttr);

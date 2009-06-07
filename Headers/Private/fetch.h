@@ -9,7 +9,7 @@
 #include <Private/mjpeg.h>
 #include <Private/utils.h>
 
-#include <VirtualFileSystemManager/VirtualFileSystemManager.h>
+#include <VirtualFileSystem/VirtualFileSystem.h>
 #include <DnaLibrary/DnaLibrary.h>
 #include <Processor/Processor.h>
 

@@ -74,6 +74,7 @@ int dispatch_process (Channel * c[NB_IDCT + 1]) {
 #endif
 
 #ifdef TIME
+  clock_t c_start, c_end;
   struct tms time_start, time_end;
 #endif
 
@@ -104,7 +105,7 @@ int dispatch_process (Channel * c[NB_IDCT + 1]) {
 #endif
 
 #ifdef TIME
-  times (& time_start);
+  c_start = times (& time_start);
 #endif
 
 	while (1) {
@@ -167,10 +168,11 @@ int dispatch_process (Channel * c[NB_IDCT + 1]) {
 #endif
 
 #ifdef TIME
-        times (& time_end);
-        printf ("Time: %ld ns\r\n", (uint32_t)(time_end . tms_stime
-              - time_start . tms_stime));
-        time_start = time_end;
+        c_end = times (& time_end);
+        printf ("[Dispatch time] %ld ns\r\n",
+            (uint32_t)(time_end . tms_stime - time_start . tms_stime));
+        printf ("[Total time] %ld ms\r\n", (uint32_t)(c_end - c_start));
+        c_start = c_end;
 #endif
 
 #ifdef PROGRESS
