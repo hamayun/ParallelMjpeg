@@ -86,6 +86,9 @@ int fetch_process (Channel * c[NB_IDCT + 1]) {
 		if (tables[HUFF_AC][HT_index] . table == NULL)  printf ("%s,%d: malloc failed\n", __FILE__, __LINE__);
 	} 
 
+#ifdef TIME
+  c_start = times (& time_start);
+#endif
 
 	/*---- Actual computation ----*/
 
@@ -96,9 +99,6 @@ int fetch_process (Channel * c[NB_IDCT + 1]) {
 			switch (marker[1]) {
 				case M_SOF0: {
 					IPRINTF("SOF0 marker found\r\n");
-#ifdef TIME
-          times (& time_start);
-#endif
 
 					COPY_SECTION(& SOF_section, sizeof (SOF_section));
 					cpu_data_is_bigendian(16, SOF_section . length);
@@ -138,11 +138,6 @@ int fetch_process (Channel * c[NB_IDCT + 1]) {
 						dispatch_info = false;
 					}
 
-#ifdef TIME
-          times (& time_end);
-          printf ("[SOF0] %ld ns\r\n",
-              (uint32_t)(time_end . tms_stime - time_start . tms_stime));
-#endif
 					break;
 				}
 
@@ -167,10 +162,6 @@ int fetch_process (Channel * c[NB_IDCT + 1]) {
 				case M_DHT: {
 					IPRINTF("DHT marker found\r\n");
 
-#ifdef TIME
-          times (& time_start);
-#endif
-
 					COPY_SECTION(& DHT_section, sizeof (DHT_section));
 					cpu_data_is_bigendian(16, DHT_section . length);
 
@@ -183,11 +174,6 @@ int fetch_process (Channel * c[NB_IDCT + 1]) {
 					VPRINTF("Loading Huffman table\r\n");
 					load_huffman_table (movie, & DHT_section, & tables[HT_type][HT_index]);
 
-#ifdef TIME
-          times (& time_end);
-          printf ("[DHT] %ld ns\r\n",
-              (uint32_t)(time_end . tms_stime - time_start . tms_stime));
-#endif
 					break;
 				}
 
@@ -336,54 +322,44 @@ int fetch_process (Channel * c[NB_IDCT + 1]) {
 					IPRINTF("%d MCU to unpack\r\n", nb_MCU);
 
 					while (nb_MCU) {
-#ifdef TIME
-            c_start = times (& time_start);
-#endif
 
-						for (uint32_t step = 0; step < flit_size; step += mcu_size) {
-							for (index = 0; index < YV * YH; index++) {
+						for (uint32_t step = 0; step < flit_size; step += mcu_size)
+            {
+							for (index = 0; index < YV * YH; index++)
+              {
 								unpack_block (movie, & scan_desc, 0, MCU);
-								iqzz_block (MCU, & FLIT[to_idct_index][(step + index) * 64], DQT_table[SOF_component[0] . q_table]);
+								iqzz_block (MCU, & FLIT[to_idct_index][(step + index) * 64],
+                    DQT_table[SOF_component[0] . q_table]);
 							}
 
-							for (index =  1; index < SOF_section . n; index++) {
+							for (index =  1; index < SOF_section . n; index++)
+              {
 								unpack_block (movie, & scan_desc, index, MCU);
-								iqzz_block (MCU, & FLIT[to_idct_index][(step + (YV * YH + index - 1)) * 64], DQT_table[SOF_component[index] . q_table]);
+								iqzz_block (MCU, & FLIT[to_idct_index][(step + (YV * YH + index - 1)) * 64],
+                    DQT_table[SOF_component[index] . q_table]);
 							}
 						}
 
-#ifdef TIME
-            c_end = times (& time_end);
-            printf ("[SOS] DECODE = %ld(abs), %ld ns(rel)\r\n",
-                (uint32_t)(c_end - c_start),
-                (uint32_t)(time_end . tms_stime - time_start . tms_stime));
-
-            c_start = times (& time_start);
-#endif
-	
 						channelWrite (c[to_idct_index + 1], (unsigned char *) FLIT[to_idct_index], flit_size * 64 * sizeof (int32_t));
 
-#ifdef TIME
-            c_end = times (& time_end);
-            printf ("[SOS] SEND = %ld(abs), %ld ns(rel)\r\n",
-                (uint32_t)(c_end - c_start),
-                (uint32_t)(time_end . tms_stime - time_start . tms_stime));
-#endif
-	
 						to_idct_index = (to_idct_index + 1) % NB_IDCT;
 						nb_MCU -= YV * nb_MCU_sx;
 
 					}
+
+#ifdef TIME
+        c_end = times (& time_end);
+        printf ("[Fetch time] %ld ns\r\n",
+            (uint32_t)(time_end . tms_stime - time_start . tms_stime));
+        c_start = c_end;
+        time_start = time_end;
+#endif
 
           break;
 				}
 
 				case M_DQT: {
 					IPRINTF("DQT marker found\r\n");
-
-#ifdef TIME
-          times (& time_start);
-#endif
 
 					COPY_SECTION(& DQT_section, sizeof (DQT_section));
 					cpu_data_is_bigendian(16, DQT_section . length);
@@ -396,11 +372,6 @@ int fetch_process (Channel * c[NB_IDCT + 1]) {
 					VPRINTF("Reading quantization table\r\n");
 					COPY_SECTION(DQT_table[QT_index], 64);
 
-#ifdef TIME
-          times (& time_end);
-          printf ("[DQT] %ld ns\r\n",
-              (uint32_t)(time_end . tms_stime - time_start . tms_stime));
-#endif
 					break;
 				}
 
@@ -431,10 +402,6 @@ int fetch_process (Channel * c[NB_IDCT + 1]) {
 				case M_APP0: {
 					IPRINTF("APP0 marker found\r\n");
 
-#ifdef TIME
-          times (& time_start);
-#endif
-
 					COPY_SECTION(& jfif_header, sizeof (jfif_header));
 					cpu_data_is_bigendian(16, jfif_header.length);
 					cpu_data_is_bigendian(16, jfif_header.xdensity);
@@ -445,11 +412,6 @@ int fetch_process (Channel * c[NB_IDCT + 1]) {
 						VPRINTF("Not a JFIF file\r\n");
 					}
 
-#ifdef TIME
-          times (& time_end);
-          printf ("[APP0] %ld ns\r\n",
-              (uint32_t)(time_end . tms_stime - time_start . tms_stime));
-#endif
 					break;
 				}
 

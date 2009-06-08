@@ -8,6 +8,7 @@
 
 #include <Private/mjpeg.h>
 #include <Private/utils.h>
+#include <Private/buffer.h>
 
 #include <VirtualFileSystem/VirtualFileSystem.h>
 #include <DnaLibrary/DnaLibrary.h>
@@ -20,54 +21,42 @@ enum fdaccess_control
   FD_LSEEK
 };
 
-/*---- Usefull macros ----*/
-#if 0
-#define NEXT_TOKEN(res) res = (p -> local -> movie[p -> local -> index++])
-
-#define COPY_SECTION(to, size) {																															\
-	memcpy ((void *)to), (const void *)(& (p -> local -> movie[p -> local -> index])), size);	\
-	p -> local -> index += size;																																\
+#define NEXT_TOKEN(res)             \
+{ 		                    					\
+	buffer_read (movie, (void *) & res, 1); 	\
 }
 
-#define SKIP(n) p -> local -> index += n
-
-#define MOVIE_DATA										\
-	unsigned long int index;						\
-	unsigned char * movie
-
-#define INITIALIZE_MOVIE_DATA					\
-	p -> local -> index = 0;						\
-	p -> local -> movie = movie
-
-#else
-
-#define NEXT_TOKEN(res) { 							\
-	read (movie, (void *) & res, 1); 	\
+#define COPY_SECTION(to, size)     \
+{                                  \
+	buffer_read (movie, (void *) to, size); \
 }
 
-#define COPY_SECTION(to, size) { \
-	read (movie, (void *) to, size); \
+#define SKIP(n)                                   \
+{																									\
+	uint8_t waste[2048];														\
+																									\
+	if (n != 0) buffer_read (movie, (void *) & waste, n);	\
 }
 
-#define SKIP(n) {																																\
-	uint8_t waste[2048];																													\
-																																								\
-	if (n != 0) read (movie, (void *) & waste, n);							\
-}
+#define MOVIE_DATA        \
+int16_t file;             \
+buffer_t movie = NULL
 
-#define MOVIE_DATA int16_t movie
+#define INITIALIZE_MOVIE_DATA				      												\
+  int32_t retval = 0;                                             \
+	file = open ("/devices/fdaccess", O_RDWR);                      \
+  vfs_ioctl (file, FD_OPEN, "movie.mjpeg", & retval);            \
+  if (retval < 0) printf ("Error opening the video file.\r\n");   \
+  else                                                            \
+  {                                                               \
+    movie = buffer_create (file, 0x10000);                        \
+  }
 
-#define INITIALIZE_MOVIE_DATA																\
-  int32_t retval = 0;                     \
-	movie = open ("/devices/fdaccess", O_RDWR);  \
-  vfs_ioctl (movie, FD_OPEN, "movie.mjpeg", & retval);\
-  if (retval < 0) printf ("Error opening the video file.\r\n");
-#endif
 
 extern const uint8_t G_ZZ[64]; 
 
 /*---- Functions used localy ----*/
-static inline void skip_segment(int16_t movie) {
+static inline void skip_segment(buffer_t movie) {
 	union {
 		uint16_t segment_size;
 		uint8_t size[2];
@@ -81,7 +70,7 @@ static inline void skip_segment(int16_t movie) {
 	SKIP(u . segment_size - 2); 
 }
 
-static inline void load_huffman_table (int16_t movie, DHT_section_t *DHT_section, huff_table_t * ht) {
+static inline void load_huffman_table (buffer_t movie, DHT_section_t *DHT_section, huff_table_t * ht) {
 	uint8_t buffer = 0;
 	int32_t size = 0, max = 0;
 	int32_t LeavesN = 0, LeavesT = 0, i = 0;
@@ -108,7 +97,7 @@ static inline void load_huffman_table (int16_t movie, DHT_section_t *DHT_section
 	SKIP(LeavesT - max);
 }
 
-static inline uint32_t get_bits (int16_t movie, scan_desc_t *scan_desc, uint8_t number) {
+static inline uint32_t get_bits (buffer_t movie, scan_desc_t *scan_desc, uint8_t number) {
 	int32_t i = 0, newbit = 0;
 	uint32_t result = 0;
 	uint8_t wwindow = 0, aux = 0;
@@ -132,7 +121,7 @@ static inline uint32_t get_bits (int16_t movie, scan_desc_t *scan_desc, uint8_t 
 	return result;
 }
 
-static inline uint8_t get_symbol (int16_t movie, scan_desc_t *scan_desc, uint32_t acdc, uint32_t component) {
+static inline uint8_t get_symbol (buffer_t movie, scan_desc_t *scan_desc, uint32_t acdc, uint32_t component) {
 	uint8_t temp = 0;
 	int32_t code = 0;
 	uint32_t length = 0, index = 0;
@@ -152,7 +141,7 @@ static inline uint8_t get_symbol (int16_t movie, scan_desc_t *scan_desc, uint32_
 	return 0;
 }
 
-static inline void unpack_block (int16_t movie, scan_desc_t * scan_desc, uint32_t index, int32_t T[64]) {
+static inline void unpack_block (buffer_t movie, scan_desc_t * scan_desc, uint32_t index, int32_t T[64]) {
 	uint32_t temp = 0, i = 0, run = 0, cat = 0;
 	int32_t value = 0;
 	uint8_t symbol = 0;
