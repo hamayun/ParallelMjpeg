@@ -72,6 +72,7 @@ int fetch_process (Channel * c[NB_IDCT + 1]) {
 	huff_table_t tables[2][4];
 
 #ifdef TIME
+  clock_t c_start, c_end;
   struct tms time_start, time_end;
 #endif
 
@@ -316,10 +317,6 @@ int fetch_process (Channel * c[NB_IDCT + 1]) {
 				case M_SOS: {
 					IPRINTF("SOS marker found\r\n");
 
-#ifdef TIME
-          times (& time_start);
-#endif
-
 					COPY_SECTION(& SOS_section, sizeof (SOS_section));
 					cpu_data_is_bigendian(16, SOS_section . length);
 
@@ -339,6 +336,10 @@ int fetch_process (Channel * c[NB_IDCT + 1]) {
 					IPRINTF("%d MCU to unpack\r\n", nb_MCU);
 
 					while (nb_MCU) {
+#ifdef TIME
+            c_start = times (& time_start);
+#endif
+
 						for (uint32_t step = 0; step < flit_size; step += mcu_size) {
 							for (index = 0; index < YV * YH; index++) {
 								unpack_block (movie, & scan_desc, 0, MCU);
@@ -351,18 +352,30 @@ int fetch_process (Channel * c[NB_IDCT + 1]) {
 							}
 						}
 
-						channelWrite (c[to_idct_index + 1], (unsigned char *) FLIT[to_idct_index], flit_size * 64 * sizeof (int32_t));
-						to_idct_index = (to_idct_index + 1) % NB_IDCT;
+#ifdef TIME
+            c_end = times (& time_end);
+            printf ("[SOS] DECODE = %ld(abs), %ld ns(rel)\r\n",
+                (uint32_t)(c_end - c_start),
+                (uint32_t)(time_end . tms_stime - time_start . tms_stime));
 
-						nb_MCU -= YV * nb_MCU_sx;
-					}
+            c_start = times (& time_start);
+#endif
+	
+						channelWrite (c[to_idct_index + 1], (unsigned char *) FLIT[to_idct_index], flit_size * 64 * sizeof (int32_t));
 
 #ifdef TIME
-          times (& time_end);
-          printf ("[SOS] %ld ns\r\n",
-              (uint32_t)(time_end . tms_stime - time_start . tms_stime));
+            c_end = times (& time_end);
+            printf ("[SOS] SEND = %ld(abs), %ld ns(rel)\r\n",
+                (uint32_t)(c_end - c_start),
+                (uint32_t)(time_end . tms_stime - time_start . tms_stime));
 #endif
-					break;
+	
+						to_idct_index = (to_idct_index + 1) % NB_IDCT;
+						nb_MCU -= YV * nb_MCU_sx;
+
+					}
+
+          break;
 				}
 
 				case M_DQT: {

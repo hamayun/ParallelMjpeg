@@ -39,6 +39,7 @@ int idct_process (Channel * c[2]) {
 
 #ifdef TIME
   int32_t thread_id;
+  clock_t c_start, c_end;
   struct tms time_start, time_end;
 #endif
 
@@ -53,21 +54,46 @@ int idct_process (Channel * c[2]) {
 
 #ifdef TIME
   thread_find (NULL, & thread_id);
-  times (& time_start);
 #endif
 
-	while (1) {
+	while (1)
+  {
+#ifdef TIME
+    c_start = times (& time_start);
+#endif
+
 		channelRead (c[0], (unsigned char *) block_YCbCr, flit_size * 64 * sizeof (int32_t));
 
-		for (uint32_t i = 0; i < flit_size; i++) IDCT(& block_YCbCr[i * 64], & Idct_YCbCr[i * 64]);
+#ifdef TIME
+    c_end = times (& time_end);
+    printf ("[Compute(%ld)] READ = %ld ms(abs), %ld ns(rel)\r\n", thread_id,
+        (uint32_t)(c_end - c_start),
+        (uint32_t)(time_end . tms_stime - time_start . tms_stime));
+
+    c_start = times (& time_start);
+#endif
+
+		for (uint32_t i = 0; i < flit_size; i++)
+    {
+      IDCT(& block_YCbCr[i * 64], & Idct_YCbCr[i * 64]);
+    }
+
+#ifdef TIME
+    c_end = times (& time_end);
+    printf ("[Compute(%ld)] IDCT = %ld ms(abs), %ld ns(rel)\r\n", thread_id,
+        (uint32_t)(c_end - c_start),
+        (uint32_t)(time_end . tms_stime - time_start . tms_stime));
+
+    c_start = times (& time_start);
+#endif
 
 		channelWrite (c[1], (unsigned char *) Idct_YCbCr, flit_size * 64 * sizeof (uint8_t));
 
 #ifdef TIME
-    times (& time_end);
-    printf ("[Compute %ld time] %ld ns\r\n", thread_id,
+    c_end = times (& time_end);
+    printf ("[Compute(%ld)] WRITE = %ld ms(abs), %ld ns(rel)\r\n", thread_id,
+        (uint32_t)(c_end - c_start),
         (uint32_t)(time_end . tms_stime - time_start . tms_stime));
-    time_start = time_end;
 #endif
 	}
 
