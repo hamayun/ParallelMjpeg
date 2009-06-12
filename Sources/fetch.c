@@ -71,7 +71,7 @@ int fetch_process (Channel * c[NB_IDCT + 1]) {
 	scan_desc_t	scan_desc = {0, 0, {}, {}};
 	huff_table_t tables[2][4];
 
-#ifdef TIME
+#ifdef FETCH_TIME
   clock_t c_start, c_end;
   struct tms time_start, time_end;
 #endif
@@ -86,7 +86,7 @@ int fetch_process (Channel * c[NB_IDCT + 1]) {
 		if (tables[HUFF_AC][HT_index] . table == NULL)  printf ("%s,%d: malloc failed\n", __FILE__, __LINE__);
 	} 
 
-#ifdef TIME
+#ifdef FETCH_TIME
   c_start = times (& time_start);
 #endif
 
@@ -347,7 +347,7 @@ int fetch_process (Channel * c[NB_IDCT + 1]) {
 
 					}
 
-#ifdef TIME
+#ifdef FETCH_TIME
         c_end = times (& time_end);
         printf ("[Fetch time] %ld ns\r\n",
             (uint32_t)(time_end . tms_stime - time_start . tms_stime));

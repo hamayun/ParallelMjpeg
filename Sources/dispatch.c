@@ -73,7 +73,7 @@ int dispatch_process (Channel * c[NB_IDCT + 1]) {
 	uint32_t block_index = 0;
 #endif
 
-#ifdef TIME
+#ifdef DISPATCH_TIME
   clock_t c_start, c_end;
   struct tms time_start, time_end;
 #endif
@@ -104,7 +104,7 @@ int dispatch_process (Channel * c[NB_IDCT + 1]) {
 	fflush (stdout);
 #endif
 
-#ifdef TIME
+#ifdef DISPATCH_TIME
   c_start = times (& time_start);
 #endif
 
@@ -158,7 +158,7 @@ int dispatch_process (Channel * c[NB_IDCT + 1]) {
 
 			if (LB_X == 0) {
 				LB_Y = (LB_Y + YV) % NB_MCU_Y;
-				if (LB_Y == 0) memcpy ((void *) 0xC3000000, picture,
+				if (LB_Y == 0) memcpy ((void *) 0xC4000000, picture,
             SOF_section . width * SOF_section . height * 2);
 			}
 
@@ -167,11 +167,11 @@ int dispatch_process (Channel * c[NB_IDCT + 1]) {
 				puts ("\033[1Ddone");
 #endif
 
-#ifdef TIME
+#ifdef DISPATCH_TIME
         c_end = times (& time_end);
         printf ("[Dispatch time] %ld ns\r\n",
             (uint32_t)(time_end . tms_stime - time_start . tms_stime));
-        printf ("[Total time] %ld ms\r\n", (uint32_t)(c_end - c_start));
+        printf ("[Total time] %ld us\r\n", (uint32_t)(c_end - c_start));
         c_start = c_end;
 #endif
 
