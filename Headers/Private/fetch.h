@@ -11,7 +11,7 @@
 #include <Private/buffer.h>
 
 #include <VirtualFileSystem/VirtualFileSystem.h>
-#include <DnaLibrary/DnaLibrary.h>
+#include <DnaTools/DnaTools.h>
 #include <Processor/Processor.h>
 
 enum fdaccess_control
