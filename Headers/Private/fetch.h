@@ -5,21 +5,16 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <sys/ioctl.h>
 
 #include <Private/mjpeg.h>
 #include <Private/utils.h>
 #include <Private/buffer.h>
 
-#include <VirtualFileSystem/VirtualFileSystem.h>
 #include <DnaTools/DnaTools.h>
 #include <Processor/Processor.h>
 
-enum fdaccess_control
-{
-  FD_OPEN = DNA_CONTROL_CODES_END,
-  FD_CLOSE,
-  FD_LSEEK
-};
+#include <SoclibHostAccess/SoclibHostAccess.h>
 
 #define NEXT_TOKEN(res)             \
 { 		                    					\
@@ -45,7 +40,7 @@ buffer_t movie = NULL
 #define INITIALIZE_MOVIE_DATA				      												\
   int32_t retval = 0;                                             \
 	file = open ("/devices/fdaccess", O_RDWR);                      \
-  vfs_ioctl (file, FD_OPEN, "movie.mjpeg", & retval);            \
+  ioctl (file, FD_OPEN, "movie.mjpeg");            \
   if (retval < 0) printf ("Error opening the video file.\r\n");   \
   else                                                            \
   {                                                               \
