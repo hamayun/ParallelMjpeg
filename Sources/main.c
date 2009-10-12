@@ -25,7 +25,8 @@ int main (void) {
 
 	channel[0] = channelInit ("/devices/rdv.0", 1);
 
-	for (uint32_t i = 0; i < 2 * NB_IDCT; i++) {
+	for (uint32_t i = 0; i < 2 * NB_IDCT; i++)
+  {
 	  sprintf(buffer,"/devices/rdv.%lu", i + 1);
 		channel[i + 1] = channelInit (buffer, 1);
 	}
@@ -33,7 +34,8 @@ int main (void) {
 	fetch_channel[0] = channel[0];
 	dispatch_channel[0] = channel[0];
 
-	for (uint32_t i = 0; i < NB_IDCT; i++) {
+	for (uint32_t i = 0; i < NB_IDCT; i++)
+  {
 		fetch_channel[i + 1] = channel[2 * i + 1];
 		dispatch_channel[i + 1] = channel[2 * i + 2];
 
@@ -43,7 +45,8 @@ int main (void) {
 
 	printf ("[MJPEG] %d IDCT\n", NB_IDCT);
 
-	for (uint32_t i = 0; i < NB_IDCT; i++) {
+	for (uint32_t i = 0; i < NB_IDCT; i++)
+  {
 		pthread_attr_init (& idctAttr[i]);
 	  sprintf(buffer,"idct.%lu", i + 1);
 		//  idctAttr[i] . procid = i;

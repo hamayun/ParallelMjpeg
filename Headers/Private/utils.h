@@ -1,9 +1,6 @@
-/*************************************************************************************
- * File   : utils.h, file for JPEG-JFIF Multi-thread decoder    
- *
+/*
  * Copyright (C) 2007 TIMA Laboratory
  * Author(s) :      Pascal GOMEZ
- * Bug Fixer(s) :   
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,31 +13,33 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- *
- *************************************************************************************/
+ * along with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
 
-#ifndef __UTILS_H__
-#define __UTILS_H__
+#ifndef UTILS_H
+#define UTILS_H
 
 #include <stdint.h>
 
-static inline int32_t intceil (int32_t N, int32_t D) {
+static inline int32_t intceil (int32_t N, int32_t D)
+{
 	int32_t i = N / D;
 
 	if (N > D * i) i++;
 	return i;
 }
 
-static inline int32_t intfloor (int32_t N, int32_t D) {
+static inline int32_t intfloor (int32_t N, int32_t D)
+{
 	int32_t i = N / D;
 
 	if (N < D * i) i--;
 	return i;
 }
 
-static inline int32_t reformat (uint32_t S, int32_t good) {
+static inline int32_t reformat (uint32_t S, int32_t good)
+{
 	int32_t St = 0;
 
 	if (good == 0) return 0;

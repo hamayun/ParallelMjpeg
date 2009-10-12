@@ -18,25 +18,20 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef MJPEG_BUFFER
-#define MJPEG_BUFFER
+#ifndef DISPATCH_H
+#define DISPATCH_H
 
-#include <stdint.h>
+#define MCU_INDEX(ptr, index) (ptr + ((index) * MCU_sx * MCU_sy))
+#define MCU_LINE(ptr,n) (ptr + ((n) * MCU_sx))
 
-typedef struct _buffer
-{
-  int16_t fd;
-  int32_t size;
-  int32_t level;
-  int32_t position;
-  uint8_t * data;
-}
-* buffer_t;
+#define FB_Y_LINE(ptr,n) (ptr + ((n) * MCU_sx * NB_MCU_X))
+#define FB_Y_INDEX(ptr,x,y) (ptr + ((y) * MCU_sy * MCU_sx * NB_MCU_X) + ((x) * MCU_sx))
 
-extern buffer_t buffer_create (int16_t fd, int32_t size);
-extern void buffer_destroy (buffer_t buffer);
+#define FB_UV_LINE(ptr,n) (ptr + (((n) * MCU_sx * NB_MCU_X) >> 1))
+#define FB_U_INDEX(ptr,x,y) (ptr + (((y) * MCU_sy * SOF_section . width) >> 1)	\
+		+ (((x) * MCU_sx >> 1)) + (SOF_section . width * SOF_section . height))
 
-extern void buffer_read (buffer_t buffer, void * data, int32_t size);
-extern void buffer_write (buffer_t buffer, void * data, int32_t size);
+#define FB_V_INDEX(ptr,x,y) (ptr + (((y) * MCU_sy * SOF_section . width >> 1))	\
+		+ (((x) * MCU_sx >> 1)) + ((SOF_section . width * SOF_section . height * 3) >> 1))
 
 #endif

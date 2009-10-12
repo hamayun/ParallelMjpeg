@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2007 TIMA Laboratory
+ * Author(s) :      Patrice GERIN patrice.gerin@imag.fr
+ * Bug Fixer(s) :   Xavier GUERIN xavier.guerin@imag.fr
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+
 #ifndef IDCT_H
 #define IDCT_H
 
@@ -18,6 +38,7 @@
  * ck = cos(k*pi/16) = s8-k = sin((8-k)*pi/16) times 1 << C_BITS and
  * rounded 
  */
+
 #define c0_1  16384
 #define c0_s2 23170
 #define c1_1  16069
@@ -38,53 +59,53 @@
 #define c8_s2 0
 #define sqrt2 c0_s2
 
-#define Y(i,j)          Y[(i << 3) + j]
-#define X(i,j)          (output[(i << 3) + j])
+#define Y(i,j) Y[(i << 3) + j]
+#define X(i,j) (output[(i << 3) + j])
 
 /*
  * The number of bits of accuracy in all (signed) integer operations: May
  * lie between 1 and 32 (bounds inclusive). 
  */
 
-#define ARITH_BITS      16
+#define ARITH_BITS 16
 
 /*
  * The minimum signed integer value that fits in ARITH_BITS: 
  */
 
-#define ARITH_MIN       (-1 << (ARITH_BITS-1))
+#define ARITH_MIN (-1 << (ARITH_BITS-1))
 
 /*
  * The maximum signed integer value that fits in ARITH_BITS: 
  */
 
-#define ARITH_MAX       (~ARITH_MIN)
+#define ARITH_MAX (~ARITH_MIN)
 
 /*
  * The number of bits coefficients are scaled up before 2-D IDCT: 
  */
 
-#define S_BITS           3
+#define S_BITS 3
 
 /*
  * The number of bits in the fractional part of a fixed point constant: 
  */
 
-#define C_BITS          14
-
-#define SCALE(x,n)      ((x) << (n))
+#define C_BITS 14
+#define SCALE(x,n) ((x) << (n))
 
 /*
  * Butterfly: but(a,b,x,y) = rot(sqrt(2),4,a,b,x,y) 
  */
 
-#define but(a,b,x,y)    { x = SUB(a,b); y = ADD(a,b); }
+#define but(a,b,x,y) { x = SUB(a,b); y = ADD(a,b); }
 
 /*
  * This version is vital in passing overall mean error test. 
  */
 
-static inline int32_t DESCALE (int32_t x, int32_t n) {
+static inline int32_t DESCALE (int32_t x, int32_t n)
+{
 	return (x + (1 << (n - 1)) - (x < 0)) >> n;
 }
 
@@ -92,19 +113,20 @@ static inline int32_t DESCALE (int32_t x, int32_t n) {
  * Maximum and minimum intermediate int values: 
  */
 
-static inline int32_t ADD(int32_t x, int32_t y) {
+static inline int32_t ADD(int32_t x, int32_t y)
+{
 	int32_t r = x + y;
-
-	return r;			/* in effect: & 0x0000FFFF */
+	return r;			/* actually: & 0x0000FFFF */
 }
 
-static inline int32_t SUB(int32_t x, int32_t y) {
+static inline int32_t SUB(int32_t x, int32_t y)
+{
 	int32_t r = x - y;
-
-	return r;			/* in effect: & 0x0000FFFF */
+	return r;			/* actually: & 0x0000FFFF */
 }
 
-static inline int32_t CMUL(int32_t c, int32_t x) {
+static inline int32_t CMUL(int32_t c, int32_t x)
+{
 	int32_t r = c * x;
 	
 	/*
@@ -119,8 +141,11 @@ static inline int32_t CMUL(int32_t c, int32_t x) {
  * Rotate (x,y) over angle k*pi/16 (counter-clockwise) and scale with f. 
  */
 
-static inline void rot(int32_t f, int32_t k, int32_t x, int32_t y, int32_t *rx, int32_t *ry) {
-	int32_t COS[2][8] = {
+static inline void rot (int32_t f, int32_t k, int32_t x,
+    int32_t y, int32_t *rx, int32_t *ry)
+{
+	int32_t COS[2][8] =
+  {
 		{c0_1, c1_1, c2_1, c3_1, c4_1, c5_1, c6_1, c7_1},
 		{c0_s2, c1_s2, c2_s2, c3_s2, c4_s2, c5_s2, c6_s2, c7_s2}
 	};
@@ -134,7 +159,8 @@ static inline void rot(int32_t f, int32_t k, int32_t x, int32_t y, int32_t *rx, 
  * sqrt(8). Original Loeffler algorithm. 
  */
 
-static inline void idct_1d(int32_t *Y) {
+static inline void idct_1d(int32_t *Y)
+{
 	int32_t z1[8], z2[8], z3[8];
 
 	/*
@@ -178,25 +204,32 @@ static inline void idct_1d(int32_t *Y) {
  * Inverse 2-D Discrete Cosine Transform. 
  */
 
-static inline void IDCT(int32_t * input, uint8_t * output) {
+static inline void IDCT (int32_t * input, uint8_t * output)
+{
 	int32_t Y[64];
 	int32_t k, l;
 
-	for (k = 0; k < 8; k++) {	
-		for (l = 0; l < 8; l++)	Y(k, l) = SCALE(input[(k << 3) + l], S_BITS);
+	for (k = 0; k < 8; k++)
+  {	
+		for (l = 0; l < 8; l++)
+    {
+      Y(k, l) = SCALE(input[(k << 3) + l], S_BITS);
+    }
+
 		idct_1d(&Y(k, 0));
 	}
 
-	for (l = 0; l < 8; l++) {
+	for (l = 0; l < 8; l++)
+  {
 		int32_t Yc[8];
 
 		for (k = 0; k < 8; k++) Yc[k] = Y(k, l);
 		
 		idct_1d(Yc);
 		
-		for (k = 0; k < 8; k++) {
+		for (k = 0; k < 8; k++)
+    {
 			int32_t r = 128 + DESCALE(Yc[k], S_BITS + 3);
-			
 			X(k, l) = (r > 255) ? 255 : ((r < 0) ? 0 : r);
 		}
 	}

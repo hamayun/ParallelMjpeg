@@ -1,5 +1,25 @@
-#ifndef __JPEG_H__
-#define __JPEG_H__
+/*
+ * Copyright (C) 2007 TIMA Laboratory
+ * Author(s) :      Patrice GERIN patrice.gerin@imag.fr
+ * Bug Fixer(s) :   Xavier GUERIN xavier.guerin@imag.fr
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+
+#ifndef JPEG_H
+#define JPEG_H
 
 #include <stdint.h>
 
@@ -82,66 +102,84 @@
 
 typedef unsigned short jpeg_marker_t;
 
-typedef struct {
-    int32_t ValPtr[16];
-    int32_t MinCode[16];
-    int32_t MaxCode[16];
-    uint8_t * table;
-} huff_table_t;
+typedef struct
+{
+  int32_t ValPtr[16];
+  int32_t MinCode[16];
+  int32_t MaxCode[16];
+  uint8_t * table;
+}
+huff_table_t;
 
-typedef struct {
-    uint8_t bit_count;
-    uint8_t window;
-    int32_t pred[3];
-    huff_table_t * table[2][3];
-} scan_desc_t;
+typedef struct
+{
+  uint8_t bit_count;
+  uint8_t window;
+  int32_t pred[3];
+  huff_table_t * table[2][3];
+}
+scan_desc_t;
 
-typedef struct __attribute__ ((__packed__)) {
-	uint16_t length;		/* Length of APP0 Field */
-	char identifier[5];	/* "JFIF" (zero terminated) Id * String */
-	uint8_t version[2];	/* JFIF Format Revision */
-	uint8_t units;			/* Units used for Resolution */
-	uint16_t xdensity;	/* Horizontal Resolution */
-	uint16_t ydensity;	/* Vertical Resolution */
-	uint8_t xthumbnail;	/* Horizontal Pixel Count */
-	uint8_t ythumbnail;	/* Vertical Pixel Count */
-} jfif_header_t;
+typedef struct __attribute__ ((__packed__))
+{
+  uint16_t length;		/* Length of APP0 Field */
+  char identifier[5];	/* "JFIF" (zero terminated) Id * String */
+  uint8_t version[2];	/* JFIF Format Revision */
+  uint8_t units;			/* Units used for Resolution */
+  uint16_t xdensity;	/* Horizontal Resolution */
+  uint16_t ydensity;	/* Vertical Resolution */
+  uint8_t xthumbnail;	/* Horizontal Pixel Count */
+  uint8_t ythumbnail;	/* Vertical Pixel Count */
+}
+jfif_header_t;
 
-typedef struct __attribute__ ((__packed__)) {
-	uint16_t length;			/* Length of DQT section */
-	uint8_t  pre_quant;	/* 4bits high : precision (0=8bits, * 1=16bits) */
-} DQT_section_t;
+typedef struct __attribute__ ((__packed__))
+{
+  uint16_t length;			/* Length of DQT section */
+  uint8_t  pre_quant;	/* 4bits high : precision (0=8bits, * 1=16bits) */
+}
+DQT_section_t;
 
-typedef struct __attribute__ ((__packed__)) {
-	uint8_t index;		/* Component index */
-	uint8_t HV;				/* H(4bits high) and V(4bits low) sampling * factors */
-	uint8_t q_table;	/* Quantization table associated */
-} SOF_component_t;
+typedef struct __attribute__ ((__packed__))
+{
+  uint8_t index;		/* Component index */
+  uint8_t HV;				/* H(4bits high) and V(4bits low) sampling * factors */
+  uint8_t q_table;	/* Quantization table associated */
+}
+SOF_component_t;
 
-typedef struct __attribute__ ((__packed__)) {
-	uint16_t length;				/* Length of SOF section */
-	uint8_t data_precision;	/* Data bit precision (usually 8, * for baseline JPEG) */
-	uint16_t height;				/* Image height in pixels */
-	uint16_t width;					/* Image width in pixels */
-	uint8_t n;							/* n = Number of components (eg. 3 for * RGB, 1 for Grayscale) */
-} SOF_section_t;
+typedef struct __attribute__ ((__packed__))
+{
+  uint16_t length;				/* Length of SOF section */
+  uint8_t data_precision;	/* Data bit precision (usually 8, * for baseline JPEG) */
+  uint16_t height;				/* Image height in pixels */
+  uint16_t width;					/* Image width in pixels */
+  uint8_t n;							/* n = Number of components (eg. 3 for * RGB, 1 for Grayscale) */
+}
+SOF_section_t;
 
-typedef struct __attribute__ ((__packed__)) {
-	uint16_t length;		/* Length in byte of this section, * including this data. */
-	uint8_t huff_info;	/* Huffman Table information : */
-											/* bit 0..3 : index (0..3, otherwise error) */
-											/* bit 4 : type (0=DC, 1=AC) */
-											/* bit 5..7 : not used, must be 0 */
-} DHT_section_t;
+typedef struct __attribute__ ((__packed__))
+{
+  uint16_t length;		/* Length in byte of this section, * including this data. */
+  uint8_t huff_info;	/* Huffman Table information : */
+  /* bit 0..3 : index (0..3, otherwise error) */
+  /* bit 4 : type (0=DC, 1=AC) */
+  /* bit 5..7 : not used, must be 0 */
+}
+DHT_section_t;
 
-typedef struct __attribute__ ((__packed__)) {
-	uint8_t index;
-	uint8_t acdc;
-} SOS_component_t;
+typedef struct __attribute__ ((__packed__))
+{
+  uint8_t index;
+  uint8_t acdc;
+}
+SOS_component_t;
 
-typedef struct __attribute__ ((__packed__)) {
-	uint16_t length;	/* Length in byte of this section, * including this data. */
-	uint8_t   n;		/* N = Number of components */
-} SOS_section_t;
+typedef struct __attribute__ ((__packed__))
+{
+  uint16_t length;	/* Length in byte of this section, * including this data. */
+  uint8_t   n;		/* N = Number of components */
+}
+SOS_section_t;
 
 #endif				// __JPEG_H__
