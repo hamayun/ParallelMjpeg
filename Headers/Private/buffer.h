@@ -38,5 +38,6 @@ extern void buffer_destroy (buffer_t buffer);
 
 extern void buffer_read (buffer_t buffer, void * data, int32_t size);
 extern void buffer_write (buffer_t buffer, void * data, int32_t size);
+extern void buffer_skip (buffer_t buffer, int32_t size);
 
 #endif

@@ -47,29 +47,27 @@ void buffer_destroy (buffer_t buffer)
 
 void buffer_read (buffer_t buffer, void * data, int32_t size)
 {
-  int32_t counter = size, res = 0;
+  int32_t counter = size, res = 0, position_in_data = 0;
+  int32_t bytes_to_transfer = 0;
 
   while (counter != 0)
   {
-    if (counter <= buffer -> level)
-    {
-      memcpy (data, (void *)(buffer -> data + buffer -> position), counter);
-      buffer -> level -= counter;
-      buffer -> position += counter;
-      counter = 0;
-    }
-    else
-    {
-      if (buffer -> level != 0)
-      {
-        memcpy (data, (void *)(buffer -> data +
-              buffer -> position), buffer -> level);
-        counter -= buffer -> level;
-      }
+    bytes_to_transfer = (counter <= buffer -> level) ?
+      counter : buffer -> level;
 
-      buffer -> data[buffer -> size] = 0xDC;
+    memcpy ((void *)((char *)data + position_in_data),
+        (void *)(buffer -> data + buffer -> position),
+        bytes_to_transfer);
+
+    position_in_data += bytes_to_transfer;
+    buffer -> position += bytes_to_transfer;
+
+    buffer -> level -= bytes_to_transfer;
+    counter -= bytes_to_transfer;
+
+    if (buffer -> level == 0)
+    {
       res = read (buffer -> fd, buffer -> data, buffer -> size);
-
       buffer -> level = buffer -> size;
       buffer -> position = 0;
     }
@@ -80,3 +78,27 @@ void buffer_write (buffer_t buffer, void * data, int32_t size)
 {
 
 }
+
+void buffer_skip (buffer_t buffer, int32_t size)
+{
+  int32_t counter = size, res = 0;
+  int32_t bytes_to_transfer = 0;
+
+  while (counter != 0)
+  {
+    bytes_to_transfer = (counter <= buffer -> level) ?
+      counter : buffer -> level;
+
+    buffer -> position += bytes_to_transfer;
+    buffer -> level -= bytes_to_transfer;
+    counter -= bytes_to_transfer;
+
+    if (buffer -> level == 0)
+    {
+      res = read (buffer -> fd, buffer -> data, buffer -> size);
+      buffer -> level = buffer -> size;
+      buffer -> position = 0;
+    }
+  }
+}
+

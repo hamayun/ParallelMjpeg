@@ -50,9 +50,7 @@
 
 #define SKIP(n)                                         \
 {                                                       \
-	uint8_t waste[2048];                                  \
-                                                        \
-	if (n != 0) buffer_read (movie, (void *) & waste, n);	\
+	buffer_skip (movie, n);	  \
 }
 
 /*
