@@ -93,7 +93,7 @@ int fetch_process (Channel * c[NB_IDCT + 1])
   }
   else
   {
-    movie = buffer_create (file, 0x800);
+    movie = buffer_create (file, 0x8000);
   }
 
 	for (HT_index = 0; HT_index < 4; HT_index++)
