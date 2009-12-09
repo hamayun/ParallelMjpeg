@@ -30,7 +30,7 @@
 #include <Core/Core.h>
 #include <KahnProcessNetwork/KahnProcessNetwork.h>
 
-int idct_process (Channel * c[2])
+int idct_process (kpn_channel_t c[2])
 {
 	uint8_t * Idct_YCbCr;
 	int32_t * block_YCbCr;
@@ -42,7 +42,7 @@ int idct_process (Channel * c[2])
   clock_t c_start, c_end;
 #endif
 
-	channelRead (c[0], (uint8_t *) & flit_size, sizeof (uint32_t));
+	kpn_channel_read (c[0], (uint8_t *) & flit_size, sizeof (uint32_t));
 	VPRINTF("Flit size = %lu\r\n", flit_size);
 
 	Idct_YCbCr = (uint8_t *) malloc (flit_size * 64 * sizeof (uint8_t));
@@ -67,7 +67,7 @@ int idct_process (Channel * c[2])
     c_start = times (NULL);
 #endif
 
-		channelRead (c[0], (unsigned char *) block_YCbCr,
+		kpn_channel_read (c[0], (unsigned char *) block_YCbCr,
         flit_size * 64 * sizeof (int32_t));
 
 #ifdef COMPUTE_TIME
@@ -85,7 +85,8 @@ int idct_process (Channel * c[2])
     c_start = times (NULL);
 #endif
 
-		channelWrite (c[1], (unsigned char *) Idct_YCbCr, flit_size * 64 * sizeof (uint8_t));
+		kpn_channel_write (c[1], (unsigned char *) Idct_YCbCr,
+        flit_size * 64 * sizeof (uint8_t));
 
 #ifdef COMPUTE_TIME
     c_end = times (NULL);

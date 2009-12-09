@@ -30,7 +30,7 @@
 #include <PosixThreads/PosixThreads.h>
 #include <KahnProcessNetwork/KahnProcessNetwork.h>
 
-int dispatch_process (Channel * c[NB_IDCT + 1])
+int dispatch_process (kpn_channel_t c[NB_IDCT + 1])
 {
 	uint8_t * MCU_YCbCr = NULL, * picture = NULL;
 	uint8_t * CELLS = NULL, * Y_SRC = NULL, * Y_DST = NULL;
@@ -67,10 +67,10 @@ int dispatch_process (Channel * c[NB_IDCT + 1])
     pthread_exit (NULL);
   }
 
-	channelRead (c[0], (unsigned char*) & SOF_section, sizeof (SOF_section));
-	channelRead (c[0], (unsigned char*) & YV, sizeof (uint32_t));
-	channelRead (c[0], (unsigned char*) & YH, sizeof (uint32_t));
-	channelRead (c[0], (unsigned char*) & flit_size, sizeof (uint32_t));
+	kpn_channel_read (c[0], (unsigned char*) & SOF_section, sizeof (SOF_section));
+	kpn_channel_read (c[0], (unsigned char*) & YV, sizeof (uint32_t));
+	kpn_channel_read (c[0], (unsigned char*) & YH, sizeof (uint32_t));
+	kpn_channel_read (c[0], (unsigned char*) & flit_size, sizeof (uint32_t));
 
 	flit_bytes = flit_size * MCU_sx * MCU_sy * sizeof (uint8_t);
 
@@ -103,7 +103,7 @@ int dispatch_process (Channel * c[NB_IDCT + 1])
 
 	while (1)
   {
-		channelRead (c[idct_index + 1], MCU_YCbCr, flit_bytes);
+		kpn_channel_read (c[idct_index + 1], MCU_YCbCr, flit_bytes);
 		idct_index = (idct_index + 1) % NB_IDCT;
 
 		for (int flit_index = 0; flit_index < flit_size; flit_index += NB_CELLS)

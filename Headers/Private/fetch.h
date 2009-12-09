@@ -29,29 +29,10 @@
 
 #include <Private/mjpeg.h>
 #include <Private/utils.h>
-#include <Private/buffer.h>
 
 #include <DnaTools/DnaTools.h>
+#include <KahnProcessNetwork/KahnProcessNetwork.h>
 #include <Processor/Processor.h>
-
-/*
- * Some macro necessary to handle tokens
- */
-
-#define NEXT_TOKEN(res)                     \
-{                                           \
-	buffer_read (movie, (void *) & res, 1); 	\
-}
-
-#define COPY_SECTION(to, size)             \
-{                                          \
-	buffer_read (movie, (void *) to, size);  \
-}
-
-#define SKIP(n)                                         \
-{                                                       \
-	buffer_skip (movie, n);	  \
-}
 
 /*
  * UnZZ table
@@ -63,7 +44,7 @@ extern const uint8_t G_ZZ[64];
  * Decompression functions
  */
 
-static inline void skip_segment(buffer_t movie)
+static inline void skip_segment (kpn_channel_t channel)
 {
 	union
   {
@@ -72,15 +53,15 @@ static inline void skip_segment(buffer_t movie)
 	}
   u;
 
-	NEXT_TOKEN(u . size[0]);
-	NEXT_TOKEN(u . size[1]);
-	cpu_data_is_bigendian(16, u . segment_size);
+	kpn_channel_read (channel, & u . size[0], 1);
+	kpn_channel_read (channel, & u . size[1], 1);
+	cpu_data_is_bigendian (16, u . segment_size);
 
 	IPRINTF("Skip segment (%d data)\r\n",(unsigned int) u . segment_size);
-	SKIP(u . segment_size - 2); 
+	kpn_channel_skip (channel, u . segment_size - 2); 
 }
 
-static inline void load_huffman_table (buffer_t movie,
+static inline void load_huffman_table (kpn_channel_t channel,
     DHT_section_t *DHT_section, huff_table_t * ht)
 {
 	uint8_t buffer = 0;
@@ -90,7 +71,7 @@ static inline void load_huffman_table (buffer_t movie,
 
 	for (i = 0; i < 16; i++)
   {
-		NEXT_TOKEN(buffer);
+		kpn_channel_read (channel, & buffer, 1);
 		LeavesN = buffer;
 		ht -> ValPtr[i] = LeavesT;
 		ht -> MinCode[i] = AuxCode * 2;
@@ -107,11 +88,11 @@ static inline void load_huffman_table (buffer_t movie,
 	}
 	else max = LeavesT;
 
-	COPY_SECTION(ht -> table, max);
-	SKIP(LeavesT - max);
+	kpn_channel_read (channel, ht -> table, max);
+	kpn_channel_skip (channel, LeavesT - max);
 }
 
-static inline uint32_t get_bits (buffer_t movie,
+static inline uint32_t get_bits (kpn_channel_t channel,
     scan_desc_t *scan_desc, uint8_t number)
 {
 	int32_t i = 0, newbit = 0;
@@ -124,9 +105,9 @@ static inline uint32_t get_bits (buffer_t movie,
   {
 		if (scan_desc -> bit_count == 0)
     {
-			NEXT_TOKEN(wwindow);
+			kpn_channel_read (channel, & wwindow, 1);
 			scan_desc -> bit_count = 8;
-			if (wwindow == 0xFF) NEXT_TOKEN(aux); 
+			if (wwindow == 0xFF) kpn_channel_read (channel, & aux, 1); 
 		}
 		else wwindow = scan_desc->window;
 
@@ -139,7 +120,7 @@ static inline uint32_t get_bits (buffer_t movie,
 	return result;
 }
 
-static inline uint8_t get_symbol (buffer_t movie, scan_desc_t *scan_desc,
+static inline uint8_t get_symbol (kpn_channel_t channel, scan_desc_t *scan_desc,
     uint32_t acdc, uint32_t component)
 {
 	uint8_t temp = 0;
@@ -149,7 +130,7 @@ static inline uint8_t get_symbol (buffer_t movie, scan_desc_t *scan_desc,
 
 	for (length = 0; length < 16; length++)
   {
-		temp = get_bits (movie, scan_desc, 1);
+		temp = get_bits (channel, scan_desc, 1);
 		code = (2 * code) | temp;
 		if (code <= HT -> MaxCode[length]) break;
 	}
@@ -163,7 +144,7 @@ static inline uint8_t get_symbol (buffer_t movie, scan_desc_t *scan_desc,
 	return 0;
 }
 
-static inline void unpack_block (buffer_t movie, scan_desc_t * scan_desc,
+static inline void unpack_block (kpn_channel_t channel, scan_desc_t * scan_desc,
     uint32_t index, int32_t T[64])
 {
 	uint32_t temp = 0, i = 0, run = 0, cat = 0;
@@ -171,8 +152,8 @@ static inline void unpack_block (buffer_t movie, scan_desc_t * scan_desc,
 	uint8_t symbol = 0;
 
 	memset ((void *) T, 0, 64 * sizeof (int32_t));
-	symbol = get_symbol (movie, scan_desc, HUFF_DC, index);
-	temp = get_bits (movie, scan_desc, symbol);
+	symbol = get_symbol (channel, scan_desc, HUFF_DC, index);
+	temp = get_bits (channel, scan_desc, symbol);
 
 	value = reformat (temp, symbol);
 	value += scan_desc -> pred[index];
@@ -182,7 +163,7 @@ static inline void unpack_block (buffer_t movie, scan_desc_t * scan_desc,
 
 	for (i = 1; i < 64; i++)
   {
-		symbol = get_symbol (movie, scan_desc, HUFF_AC, index);
+		symbol = get_symbol (channel, scan_desc, HUFF_AC, index);
 
 		if (symbol == HUFF_EOB) 
     {
@@ -198,7 +179,7 @@ static inline void unpack_block (buffer_t movie, scan_desc_t * scan_desc,
 		cat = symbol & 15;
 		run = (symbol >> 4) & 15;
 		i += run;
-		temp = get_bits (movie, scan_desc, cat);
+		temp = get_bits (channel, scan_desc, cat);
 		value = reformat(temp, cat);
 		T[i] = value ;    
 	}
