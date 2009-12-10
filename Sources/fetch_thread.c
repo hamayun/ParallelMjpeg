@@ -50,7 +50,7 @@ const uint8_t G_ZZ[64] =
  * The Fetch thread function
  */
 
-int fetch_process (kpn_channel_t c[NB_IDCT + 2])
+int32_t fetch_thread (kpn_channel_t c[NB_IDCT + 2])
 {
 	bool dispatch_info = true;
 

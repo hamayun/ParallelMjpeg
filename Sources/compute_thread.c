@@ -23,14 +23,10 @@
 #include <malloc.h>
 #include <sys/times.h>
 
-#include <Private/compute.h>
-#include <Private/mjpeg.h>
-#include <Private/utils.h>
-
+#include <Private/ComputeThread.h>
 #include <Core/Core.h>
-#include <KahnProcessNetwork/KahnProcessNetwork.h>
 
-int idct_process (kpn_channel_t c[2])
+int32_t compute_thread (kpn_channel_t c[2])
 {
 	uint8_t * Idct_YCbCr;
 	int32_t * block_YCbCr;

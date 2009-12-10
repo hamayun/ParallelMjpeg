@@ -23,14 +23,10 @@
 #include <malloc.h>
 #include <sys/times.h>
 
-#include <Private/mjpeg.h>
-#include <Private/dispatch.h>
-#include <Private/utils.h>
-
+#include <Private/DispatchThread.h>
 #include <PosixThreads/PosixThreads.h>
-#include <KahnProcessNetwork/KahnProcessNetwork.h>
 
-int dispatch_process (kpn_channel_t c[NB_IDCT + 1])
+int32_t dispatch_thread (kpn_channel_t c[NB_IDCT + 1])
 {
 	uint8_t * MCU_YCbCr = NULL, * picture = NULL;
 	uint8_t * CELLS = NULL, * Y_SRC = NULL, * Y_DST = NULL;

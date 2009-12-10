@@ -22,17 +22,15 @@
 #define FETCH_H
 
 #include <stdint.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/ioctl.h>
-
-#include <Private/mjpeg.h>
-#include <Private/utils.h>
-
-#include <DnaTools/DnaTools.h>
+#include <Private/Mjpeg.h>
 #include <KahnProcessNetwork/KahnProcessNetwork.h>
 #include <Processor/Processor.h>
+
+/*
+ * Definition of the thread signature
+ */
+
+extern int32_t fetch_thread (kpn_channel_t c[NB_IDCT + 2]);
 
 /*
  * UnZZ table

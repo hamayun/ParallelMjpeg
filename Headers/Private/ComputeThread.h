@@ -22,6 +22,14 @@
 #define IDCT_H
 
 #include <stdint.h>
+#include <Private/Mjpeg.h>
+#include <KahnProcessNetwork/KahnProcessNetwork.h>
+
+/*
+ * Declaration of the thread
+ */
+
+extern int32_t compute_thread (kpn_channel_t c[2]);
 
 /*
  * Minimum and maximum values a `signed int' can hold.  

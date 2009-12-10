@@ -10,10 +10,6 @@
 #include <KahnProcessNetwork/KahnProcessNetwork.h>
 #include <SoclibHostAccess/SoclibHostAccess.h>
 
-extern void * fetch_process (void * c);
-extern void * idct_process (void * c);
-extern void * dispatch_process (void * c);
-
 int main (void)
 {
 	kpn_channel_t channel[2 * NB_IDCT + 2];
@@ -26,16 +22,32 @@ int main (void)
 
   char buffer[128];
 
+  /*
+   * Create a channel connected to the input movie
+   */
+
 	kpn_channel_create ("/devices/fdaccess", 0x10000, & channel[0]);
   ioctl (channel[0] -> fd, FD_OPEN, "movie.mjpeg");
 
+  /*
+   * Create the first FETCH -> DISPATCH channel
+   */
+
 	kpn_channel_create ("/devices/rdv.0", 0, & channel[1]);
+
+  /*
+   * Create the FETCH -> IDCT and IDCT -> DISPATCH channels
+   */
 
 	for (uint32_t i = 0; i < 2 * NB_IDCT; i += 1)
   {
 	  sprintf(buffer,"/devices/rdv.%lu", i + 1);
 		kpn_channel_create (buffer, 0, & channel[i + 2]);
 	}
+
+  /*
+   * Connect the channels altogether
+   */
 	
 	fetch_channel[0] = channel[0];
 	fetch_channel[1] = channel[1];
@@ -50,28 +62,69 @@ int main (void)
 		dispatch_channel[i + 1] = channel[2 * i + 3];
 	}
 
+  /*
+   * Starting the MJPEG application
+   */
+
 	printf ("[MJPEG] %d IDCT\n", NB_IDCT);
+
+  /*
+   * Create the IDCT threads
+   */
 
 	for (uint32_t i = 0; i < NB_IDCT; i++)
   {
 		pthread_attr_init (& idctAttr[i]);
+
 	  sprintf(buffer,"idct.%lu", i + 1);
-		//  idctAttr[i] . procid = i;
 		idctAttr[i] . name = buffer;
-  	pthread_create (& idctThread[i], & idctAttr[i], idct_process, idct_channel[i]);
+
+#if 0 /* Enable to set a particular processor affinity */
+		idctAttr[i] . procid = i;
+#endif
+
+  	pthread_create (& idctThread[i], & idctAttr[i],
+        idct_process, idct_channel[i]);
 	}
 
+  /*
+   *  Create the FETCH thread
+   */
+
 	pthread_attr_init (& fetchAttr);
-	//  fetchAttr . procid = 3;
 	fetchAttr . name = "fetch";
 
-	pthread_attr_init (& dispatchAttr);
-	//	dispatchAttr . procid = 1;
-	dispatchAttr . name = "dispatch";
+#if 0 /* Enable to set a particular processor affinity */
+	fetchAttr . procid = 3;
+#endif
 
   pthread_create (& fetchThread, & fetchAttr, fetch_process, fetch_channel);
-  pthread_create (& dispatchThread, & dispatchAttr, dispatch_process, dispatch_channel);
 
-  pthread_join(dispatchThread, NULL);
+  /*
+   * Create the DISPATCH thread
+   */
+
+	pthread_attr_init (& dispatchAttr);
+	dispatchAttr . name = "dispatch";
+
+#if 0 /* Enable to set a particular processor affinity */
+	dispatchAttr . procid = 1;
+#endif
+
+  pthread_create (& dispatchThread, & dispatchAttr,
+      dispatch_process, dispatch_channel);
+
+  /*
+   * Join with the created threads
+   */
+
+	for (uint32_t i = 0; i < NB_IDCT; i++)
+  {
+  	pthread_join (idctThread[i], NULL);
+	}
+
+  pthread_join (fetchThread, NULL);
+  pthread_join (dispatchThread, NULL);
+
 	return 0;
 }

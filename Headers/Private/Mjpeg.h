@@ -18,13 +18,24 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef JPEG_H
-#define JPEG_H
+#ifndef MJPEG_H
+#define MJPEG_H
 
 #include <stdint.h>
 
-#define MCU_sx 8
-#define MCU_sy 8
+#ifdef VERBOSE
+#define VPRINTF(format, ...)  \
+  printf ("[%.40s] " format, __FUNCTION__, ## __VA_ARGS__)
+#else
+#define VPRINTF(format, ...)
+#endif
+
+#ifdef INFO
+#define IPRINTF(format, ...)  \
+  printf ("[%.40s] " format, __FUNCTION__, ## __VA_ARGS__)
+#else
+#define IPRINTF(format, ...)
+#endif
 
 #define HUFF_DC			0
 #define HUFF_AC			1
@@ -182,4 +193,35 @@ typedef struct __attribute__ ((__packed__))
 }
 SOS_section_t;
 
-#endif				// __JPEG_H__
+/*
+ * Utils
+ */
+
+static inline int32_t intceil (int32_t N, int32_t D)
+{
+	int32_t i = N / D;
+
+	if (N > D * i) i++;
+	return i;
+}
+
+static inline int32_t intfloor (int32_t N, int32_t D)
+{
+	int32_t i = N / D;
+
+	if (N < D * i) i--;
+	return i;
+}
+
+static inline int32_t reformat (uint32_t S, int32_t good)
+{
+	int32_t St = 0;
+
+	if (good == 0) return 0;
+	St = 1 << (good - 1);	/* 2^(good-1) */
+
+	if (S < St) return (S + 1 + ((-1) << good));
+	else return S;
+}
+
+#endif
