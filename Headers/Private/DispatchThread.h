@@ -29,7 +29,7 @@
  * Define the thread signature
  */
 
-extern int32_t dispatch_thread (kpn_channel_t c[NB_IDCT + 1]);
+extern int32_t dispatch_thread (kpn_channel_t c[NB_IDCT + 2]);
 
 /*
  * Define useful macro to deal with the picture format

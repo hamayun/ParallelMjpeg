@@ -12,18 +12,19 @@
 #include <PosixThreads/PosixThreads.h>
 #include <KahnProcessNetwork/KahnProcessNetwork.h>
 #include <SoclibHostAccess/SoclibHostAccess.h>
+#include <SoclibFramebuffer/SoclibFramebuffer.h>
 
 int main (void)
 {
-	kpn_channel_t channel[2 * NB_IDCT + 2];
+  char buffer[128];
+
+	kpn_channel_t channel[2 * NB_IDCT + 3];
 	kpn_channel_t fetch_channel[2 + NB_IDCT];
-	kpn_channel_t dispatch_channel[1 + NB_IDCT];
 	kpn_channel_t compute_channel[NB_IDCT][2];
+	kpn_channel_t dispatch_channel[2 + NB_IDCT];
 
 	pthread_t fetchThread, dispatchThread, computeThread[NB_IDCT];
 	pthread_attr_t fetchAttr, dispatchAttr, computeAttr[NB_IDCT];
-
-  char buffer[128];
 
   /*
    * Create a channel connected to the input movie
@@ -33,10 +34,17 @@ int main (void)
   ioctl (channel[0] -> fd, FD_OPEN, "movie.mjpeg");
 
   /*
+   * Create a channel connected to the framebuffer 
+   */
+
+	kpn_channel_create ("/devices/framebuffer.0", 0, & channel[1]);
+  ioctl (channel[1] -> fd, FB_SET_AUTOREWIND, (void *) true);
+
+  /*
    * Create the first FETCH -> DISPATCH channel
    */
 
-	kpn_channel_create ("/devices/rdv.0", 0, & channel[1]);
+	kpn_channel_create ("/devices/rdv.0", 0, & channel[2]);
 
   /*
    * Create the FETCH -> IDCT and IDCT -> DISPATCH channels
@@ -45,7 +53,7 @@ int main (void)
 	for (uint32_t i = 0; i < 2 * NB_IDCT; i += 1)
   {
 	  sprintf(buffer,"/devices/rdv.%lu", i + 1);
-		kpn_channel_create (buffer, 0, & channel[i + 2]);
+		kpn_channel_create (buffer, 0, & channel[i + 3]);
 	}
 
   /*
@@ -53,16 +61,17 @@ int main (void)
    */
 	
 	fetch_channel[0] = channel[0];
-	fetch_channel[1] = channel[1];
-	dispatch_channel[0] = channel[1];
+	fetch_channel[1] = channel[2];
+	dispatch_channel[0] = channel[2];
+	dispatch_channel[1] = channel[1];
 
 	for (uint32_t i = 0; i < NB_IDCT; i++)
   {
-		fetch_channel[i + 2] = channel[2 * i + 2];
-		compute_channel[i][0] = channel[2 * i + 2];
+		fetch_channel[i + 2] = channel[2 * i + 3];
+		compute_channel[i][0] = channel[2 * i + 3];
 
-		compute_channel[i][1] = channel[2 * i + 3];
-		dispatch_channel[i + 1] = channel[2 * i + 3];
+		compute_channel[i][1] = channel[2 * i + 4];
+		dispatch_channel[i + 2] = channel[2 * i + 4];
 	}
 
   /*

@@ -26,7 +26,7 @@
 #include <Private/DispatchThread.h>
 #include <PosixThreads/PosixThreads.h>
 
-int32_t dispatch_thread (kpn_channel_t c[NB_IDCT + 1])
+int32_t dispatch_thread (kpn_channel_t c[NB_IDCT + 2])
 {
 	uint8_t * MCU_YCbCr = NULL, * picture = NULL;
 	uint8_t * CELLS = NULL, * Y_SRC = NULL, * Y_DST = NULL;
@@ -54,14 +54,6 @@ int32_t dispatch_thread (kpn_channel_t c[NB_IDCT + 1])
 #endif
 
 	SOF_section_t SOF_section;
-  FILE * fb;
-
-  fb = fopen ("/devices/framebuffer.0", "r+");
-  if (fb == NULL)
-  {
-    printf ("error: cannot open framebuffer.\r\n");
-    pthread_exit (NULL);
-  }
 
 	kpn_channel_read (c[0], (unsigned char*) & SOF_section, sizeof (SOF_section));
 	kpn_channel_read (c[0], (unsigned char*) & YV, sizeof (uint32_t));
@@ -78,12 +70,14 @@ int32_t dispatch_thread (kpn_channel_t c[NB_IDCT + 1])
 	if (picture == NULL)
   {
     printf ("%s,%d: malloc failed\n", __FILE__, __LINE__);
+    pthread_exit (0);
   }
 
 	MCU_YCbCr = (uint8_t *) malloc(flit_bytes);
 	if (MCU_YCbCr == NULL)
   {
     printf ("%s,%d: malloc failed\n", __FILE__, __LINE__);
+    pthread_exit (0);
   }
 
 	NB_MCU = NB_MCU_Y * NB_MCU_X;
@@ -99,7 +93,7 @@ int32_t dispatch_thread (kpn_channel_t c[NB_IDCT + 1])
 
 	while (1)
   {
-		kpn_channel_read (c[idct_index + 1], MCU_YCbCr, flit_bytes);
+		kpn_channel_read (c[idct_index + 2], MCU_YCbCr, flit_bytes);
 		idct_index = (idct_index + 1) % NB_IDCT;
 
 		for (int flit_index = 0; flit_index < flit_size; flit_index += NB_CELLS)
@@ -164,10 +158,8 @@ int32_t dispatch_thread (kpn_channel_t c[NB_IDCT + 1])
 
 				if (LB_Y == 0) 
         {
-          rewind (fb);
-          fwrite (picture, SOF_section . width *
-              SOF_section . height * 2, 1, fb);
-          fflush (fb);
+          kpn_channel_write (c[1], picture,
+              SOF_section . width * SOF_section . height * 2);
 
 #ifdef PROGRESS
           puts ("\033[1Ddone");
