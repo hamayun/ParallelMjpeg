@@ -37,6 +37,9 @@
 #define IPRINTF(format, ...)
 #endif
 
+#define MCU_sx 8
+#define MCU_sy 8
+
 #define HUFF_DC			0
 #define HUFF_AC			1
 #define HUFF_EOB    0x00

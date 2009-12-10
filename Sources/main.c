@@ -4,7 +4,10 @@
 #include <math.h>
 #include <sys/ioctl.h>
 
-#include <Private/mjpeg.h>
+#include <Private/Mjpeg.h>
+#include <Private/FetchThread.h>
+#include <Private/ComputeThread.h>
+#include <Private/DispatchThread.h>
 
 #include <PosixThreads/PosixThreads.h>
 #include <KahnProcessNetwork/KahnProcessNetwork.h>
@@ -15,10 +18,10 @@ int main (void)
 	kpn_channel_t channel[2 * NB_IDCT + 2];
 	kpn_channel_t fetch_channel[2 + NB_IDCT];
 	kpn_channel_t dispatch_channel[1 + NB_IDCT];
-	kpn_channel_t idct_channel[NB_IDCT][2];
+	kpn_channel_t compute_channel[NB_IDCT][2];
 
-	pthread_t fetchThread, dispatchThread, idctThread[NB_IDCT];
-	pthread_attr_t fetchAttr, dispatchAttr, idctAttr[NB_IDCT];
+	pthread_t fetchThread, dispatchThread, computeThread[NB_IDCT];
+	pthread_attr_t fetchAttr, dispatchAttr, computeAttr[NB_IDCT];
 
   char buffer[128];
 
@@ -56,9 +59,9 @@ int main (void)
 	for (uint32_t i = 0; i < NB_IDCT; i++)
   {
 		fetch_channel[i + 2] = channel[2 * i + 2];
-		idct_channel[i][0] = channel[2 * i + 2];
+		compute_channel[i][0] = channel[2 * i + 2];
 
-		idct_channel[i][1] = channel[2 * i + 3];
+		compute_channel[i][1] = channel[2 * i + 3];
 		dispatch_channel[i + 1] = channel[2 * i + 3];
 	}
 
@@ -74,17 +77,17 @@ int main (void)
 
 	for (uint32_t i = 0; i < NB_IDCT; i++)
   {
-		pthread_attr_init (& idctAttr[i]);
+		pthread_attr_init (& computeAttr[i]);
 
-	  sprintf(buffer,"idct.%lu", i + 1);
-		idctAttr[i] . name = buffer;
+	  sprintf(buffer,"compute.%lu", i + 1);
+		computeAttr[i] . name = buffer;
 
 #if 0 /* Enable to set a particular processor affinity */
-		idctAttr[i] . procid = i;
+		computeAttr[i] . procid = i;
 #endif
 
-  	pthread_create (& idctThread[i], & idctAttr[i],
-        idct_process, idct_channel[i]);
+  	pthread_create (& computeThread[i], & computeAttr[i],
+        (pthread_func_t) compute_thread, compute_channel[i]);
 	}
 
   /*
@@ -98,7 +101,8 @@ int main (void)
 	fetchAttr . procid = 3;
 #endif
 
-  pthread_create (& fetchThread, & fetchAttr, fetch_process, fetch_channel);
+  pthread_create (& fetchThread, & fetchAttr, 
+      (pthread_func_t) fetch_thread, fetch_channel);
 
   /*
    * Create the DISPATCH thread
@@ -112,7 +116,7 @@ int main (void)
 #endif
 
   pthread_create (& dispatchThread, & dispatchAttr,
-      dispatch_process, dispatch_channel);
+      (pthread_func_t) dispatch_thread, dispatch_channel);
 
   /*
    * Join with the created threads
@@ -120,7 +124,7 @@ int main (void)
 
 	for (uint32_t i = 0; i < NB_IDCT; i++)
   {
-  	pthread_join (idctThread[i], NULL);
+  	pthread_join (computeThread[i], NULL);
 	}
 
   pthread_join (fetchThread, NULL);

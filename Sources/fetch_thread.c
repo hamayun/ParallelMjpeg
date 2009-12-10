@@ -26,9 +26,7 @@
 #include <malloc.h>
 #include <sys/times.h>
 
-#include <Private/fetch.h>
-#include <Private/utils.h>
-#include <Private/mjpeg.h> 
+#include <Private/FetchThread.h>
 
 /*
  * Define the ZZ inversion table
