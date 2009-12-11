@@ -21,6 +21,7 @@
 #ifndef MJPEG_H
 #define MJPEG_H
 
+#include <stdio.h>
 #include <stdint.h>
 
 #ifdef VERBOSE

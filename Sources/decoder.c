@@ -20,13 +20,13 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
 #include <malloc.h>
-#include <sys/times.h>
 
-#include <Private/FetchThread.h>
+#include <Private/Decoder.h>
+#include <Private/Computer.h>
+#include <Private/Builder.h>
 
 /*
  * Define the ZZ inversion table
@@ -45,20 +45,20 @@ const uint8_t G_ZZ[64] =
 };
 
 /*
- * The Fetch thread function
+ * The MJPEG decoder function
  */
 
-int32_t fetch_thread (kpn_channel_t c[NB_IDCT + 2])
+int32_t decoder (kpn_channel_t c[2])
 {
 	bool dispatch_info = true;
 
 	uint8_t marker[2], HT_type = 0, HT_index = 0;
 	uint8_t DQT_table[4][64], index = 0, QT_index = 0;
-	uint8_t to_idct_index = 0;
+	uint8_t * picture = NULL, * DECODED_FLIT = NULL;
 
 	uint16_t nb_MCU = 0, nb_MCU_sx = 0;
 
-  int32_t MCU[64], * FLIT[NB_IDCT];
+  int32_t MCU[64], * FLIT = NULL;
 	uint32_t YH = 0, YV = 0, flit_size = 0, mcu_size = 0;
 
 	jfif_header_t	jfif_header;
@@ -70,11 +70,6 @@ int32_t fetch_thread (kpn_channel_t c[NB_IDCT + 2])
 	SOS_component_t	SOS_component[3];
 	scan_desc_t	scan_desc = {0, 0, {}, {}};
 	huff_table_t tables[2][4];
-
-#ifdef FETCH_TIME
-  clock_t c_start, c_end;
-  struct tms time_start, time_end;
-#endif
 
 	for (HT_index = 0; HT_index < 4; HT_index++)
   {
@@ -90,10 +85,6 @@ int32_t fetch_thread (kpn_channel_t c[NB_IDCT + 2])
       printf ("%s,%d: malloc failed\n", __FILE__, __LINE__);
     }
 	} 
-
-#ifdef FETCH_TIME
-  c_start = times (& time_start);
-#endif
 
   /*
    * Computation loop
@@ -140,28 +131,15 @@ int32_t fetch_thread (kpn_channel_t c[NB_IDCT + 2])
 						flit_size = YV * nb_MCU_sx + (SOF_section . n - 1) * nb_MCU_sx / YH;
 						mcu_size = YV * YH + SOF_section . n - 1;
 
-						for (uint32_t i = 0; i < NB_IDCT; i++)
-            {
-							FLIT[i] = (int32_t *) malloc (flit_size * 64 * sizeof (int32_t));
-							if (FLIT[i] == NULL)
-              {
-                printf ("%s,%d: malloc failed\n", __FILE__, __LINE__);
-              }
-						}
+            /*
+             * We reserve enough memory to work
+             */
 
-						VPRINTF("Send SOF info to LIBU and IDCT\r\n");
-						kpn_channel_write (c[1], (unsigned char *) & SOF_section,
-                sizeof (SOF_section_t));
-						kpn_channel_write (c[1], (unsigned char *) & YV, sizeof (uint32_t));
-						kpn_channel_write (c[1], (unsigned char *) & YH, sizeof (uint32_t));
-						kpn_channel_write (c[1], (unsigned char *) & flit_size,
-                sizeof (uint32_t));
+            FLIT = (int32_t *) malloc (flit_size * 64 * sizeof (int32_t));
+            DECODED_FLIT = (uint8_t *) malloc (flit_size * 64);
+            picture = (uint8_t *) malloc (SOF_section . width
+                * SOF_section . height * 2);
 
-						for (uint32_t i = 0; i < NB_IDCT; i++)
-            {
-              kpn_channel_write (c[i + 2], (uint8_t *) & flit_size,
-                  sizeof (uint32_t));
-            }
 						dispatch_info = false;
 					}
 
@@ -361,34 +339,26 @@ int32_t fetch_thread (kpn_channel_t c[NB_IDCT + 2])
 							for (index = 0; index < YV * YH; index++)
               {
 								unpack_block (c[0], & scan_desc, 0, MCU);
-								iqzz_block (MCU, & FLIT[to_idct_index][(step + index) * 64],
+								iqzz_block (MCU, & FLIT[(step + index) * 64],
                     DQT_table[SOF_component[0] . q_table]);
 							}
 
 							for (index =  1; index < SOF_section . n; index++)
               {
 								unpack_block (c[0], & scan_desc, index, MCU);
-								iqzz_block (MCU, & FLIT[to_idct_index]
-                    [(step + (YV * YH + index - 1)) * 64],
+								iqzz_block (MCU, & FLIT[(step + (YV * YH + index - 1)) * 64],
                     DQT_table[SOF_component[index] . q_table]);
 							}
 						}
 
-						kpn_channel_write (c[to_idct_index + 2], (unsigned char *)
-                FLIT[to_idct_index], flit_size * 64 * sizeof (int32_t));
+            computer (flit_size, FLIT, DECODED_FLIT);
+            builder (SOF_section, YV, YH, flit_size, DECODED_FLIT, picture);
 
-						to_idct_index = (to_idct_index + 1) % NB_IDCT;
 						nb_MCU -= YV * nb_MCU_sx;
-
 					}
 
-#ifdef FETCH_TIME
-        c_end = times (& time_end);
-        printf ("[Fetch time] %ld ns\r\n",
-            (uint32_t)(time_end . tms_stime - time_start . tms_stime));
-        c_start = c_end;
-        time_start = time_end;
-#endif
+          kpn_channel_write (c[1], picture, SOF_section . width
+              * SOF_section . height * 2);
 
           break;
 				}
@@ -583,6 +553,6 @@ int32_t fetch_thread (kpn_channel_t c[NB_IDCT + 2])
 		}
 	}
 
-	return 0;
+  return 0;
 }
 

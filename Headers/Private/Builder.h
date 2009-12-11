@@ -29,7 +29,8 @@
  * Define the thread signature
  */
 
-extern int32_t dispatch_thread (kpn_channel_t c[NB_IDCT + 2]);
+extern void builder ( SOF_section_t SOF_section, uint32_t YV, uint32_t YH,
+    uint32_t flit_size, uint8_t * MCU_YCbCr, uint8_t * picture);
 
 /*
  * Define useful macro to deal with the picture format

@@ -18,8 +18,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef FETCH_H
-#define FETCH_H
+#ifndef DECODER_H
+#define DECODER_H
 
 #include <stdint.h>
 #include <Private/Mjpeg.h>
@@ -30,7 +30,7 @@
  * Definition of the thread signature
  */
 
-extern int32_t fetch_thread (kpn_channel_t c[NB_IDCT + 2]);
+extern int32_t decoder (kpn_channel_t c[2]);
 
 /*
  * UnZZ table

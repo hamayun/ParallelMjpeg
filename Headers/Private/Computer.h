@@ -23,13 +23,13 @@
 
 #include <stdint.h>
 #include <Private/Mjpeg.h>
-#include <KahnProcessNetwork/KahnProcessNetwork.h>
 
 /*
  * Declaration of the thread
  */
 
-extern int32_t compute_thread (kpn_channel_t c[2]);
+extern void computer (uint32_t flit_size,
+    int32_t * block_YCbCr, uint8_t * Idct_YCbCr);
 
 /*
  * Minimum and maximum values a `signed int' can hold.  
