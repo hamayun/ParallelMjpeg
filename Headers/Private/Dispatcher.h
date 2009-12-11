@@ -26,6 +26,6 @@
 #include <KahnProcessNetwork/KahnProcessNetwork.h>
 #include <Processor/Processor.h>
 
-extern int32_t dispatcher (kpn_channel_t c[2]);
+extern int32_t dispatcher (kpn_channel_t c[NB_DECODER + 1]);
 
 #endif

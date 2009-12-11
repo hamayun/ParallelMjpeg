@@ -30,18 +30,11 @@
  * The dispatcher function
  */
 
-int32_t dispatcher (kpn_channel_t c[2])
+int32_t dispatcher (kpn_channel_t c[NB_DECODER + 1])
 {
-	uint8_t marker0, marker1, data;
-  bool keep_looking = true, soi_started = false;
-  uint8_t * buffer = NULL;
-  uint32_t section_size = 0;
-
-  /*
-   * Allocate an arbitrary sized buffer
-   */
-
-  buffer = malloc (0x8000);
+	uint8_t marker0, marker1;
+  bool soi_started = false;
+  int32_t next_decoder = 0;
 
   /*
    * Parse the stream
@@ -58,32 +51,36 @@ int32_t dispatcher (kpn_channel_t c[2])
       switch (marker1)
       {
         case M_SOI :
-          buffer[0] = marker0;
-          buffer[1] = marker1;
+          IPRINTF ("Found SOI\r\n");
 
-          section_size = 2;
+          kpn_channel_write (c[next_decoder + 1], & marker0, 1);
+          kpn_channel_write (c[next_decoder + 1], & marker1, 1);
+
+          soi_started = true;
           break;
 
         case M_EOI :
-          buffer[section_size++] = marker0;
-          buffer[section_size++] = marker1;
+          IPRINTF ("Found EOI\r\n");
 
-          section_size += 2;
-          printf ("Section size is %d", section_size);
-          kpn_channel_write (c[1], buffer, 0x8000);
+          kpn_channel_write (c[next_decoder + 1], & marker0, 1);
+          kpn_channel_write (c[next_decoder + 1], & marker1, 1);
 
-          section_size = 0;
+          IPRINTF ("Flushing data to the decoder\r\n");
+          kpn_channel_purge (c[next_decoder + 1], true);
+
           soi_started = false;
+          next_decoder = (next_decoder + 1) % NB_DECODER;
           break;
 
         default:
-          buffer[section_size++] = marker1;
+          kpn_channel_write (c[next_decoder + 1], & marker0, 1);
+          kpn_channel_write (c[next_decoder + 1], & marker1, 1);
           break;
       }
     }
     else if (soi_started)
     {
-      buffer[section_size++] = marker0;
+      kpn_channel_write (c[next_decoder + 1], & marker0, 1);
     }
   }
 }

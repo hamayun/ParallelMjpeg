@@ -360,6 +360,7 @@ int32_t decoder (kpn_channel_t c[2])
           kpn_channel_write (c[1], picture, SOF_section . width
               * SOF_section . height * 2);
 
+          kpn_channel_purge (c[0], false);
           break;
 				}
 
