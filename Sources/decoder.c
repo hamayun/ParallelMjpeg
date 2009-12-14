@@ -60,6 +60,7 @@ int32_t decoder (kpn_channel_t c[2])
 
   int32_t MCU[64], * FLIT = NULL;
 	uint32_t YH = 0, YV = 0, flit_size = 0, mcu_size = 0;
+	uint32_t LB_X = 0, LB_Y = 0;
 
 	jfif_header_t	jfif_header;
 	DQT_section_t	DQT_section;
@@ -352,7 +353,8 @@ int32_t decoder (kpn_channel_t c[2])
 						}
 
             computer (flit_size, FLIT, DECODED_FLIT);
-            builder (SOF_section, YV, YH, flit_size, DECODED_FLIT, picture);
+            builder (SOF_section, YV, YH, flit_size, DECODED_FLIT,
+                picture, & LB_X, & LB_Y);
 
 						nb_MCU -= YV * nb_MCU_sx;
 					}

@@ -22,7 +22,8 @@
 #include <Private/Builder.h>
 
 void builder ( SOF_section_t SOF_section, uint32_t YV, uint32_t YH,
-    uint32_t flit_size, uint8_t * MCU_YCbCr, uint8_t * picture)
+    uint32_t flit_size, uint8_t * MCU_YCbCr, uint8_t * picture,
+    uint32_t * LB_X, uint32_t * LB_Y)
 {
 	uint8_t * CELLS = NULL, * Y_SRC = NULL, * Y_DST = NULL;
 	uint8_t * U_SRC = NULL, * U_DST = NULL;
@@ -33,7 +34,6 @@ void builder ( SOF_section_t SOF_section, uint32_t YV, uint32_t YH,
 	uint16_t NB_CELLS = 0;
 
 	uint32_t flit_bytes = 0;
-  static uint32_t LB_X = 0, LB_Y = 0;
 	uint32_t * y_line_dst = NULL, * y_line_src = NULL;
 
 #ifdef PROGRESS
@@ -61,7 +61,7 @@ void builder ( SOF_section_t SOF_section, uint32_t YV, uint32_t YH,
       for (int cell_x_index = 0; cell_x_index < YH; cell_x_index += 1)
       {
         Y_SRC = MCU_INDEX(CELLS, (YH * cell_y_index + cell_x_index));
-        Y_DST = FB_Y_INDEX(picture, LB_X + cell_x_index, LB_Y + cell_y_index);
+        Y_DST = FB_Y_INDEX(picture, *LB_X + cell_x_index, *LB_Y + cell_y_index);
 
         for (int line_index = 0; line_index < MCU_sy; line_index += 1)
         {
@@ -72,7 +72,7 @@ void builder ( SOF_section_t SOF_section, uint32_t YV, uint32_t YH,
       }
 
       U_SRC = MCU_INDEX(CELLS, (YH * YV));
-      U_DST = FB_U_INDEX(picture, LB_X, LB_Y + cell_y_index);
+      U_DST = FB_U_INDEX(picture, *LB_X, *LB_Y + cell_y_index);
 
       for (int line_index = 0; line_index < MCU_sy; line_index += 1)
       {
@@ -86,7 +86,7 @@ void builder ( SOF_section_t SOF_section, uint32_t YV, uint32_t YH,
       }
 
       V_SRC = MCU_INDEX(CELLS, (YH * YV + 1));
-      V_DST = FB_V_INDEX(picture, LB_X, LB_Y + cell_y_index);
+      V_DST = FB_V_INDEX(picture, *LB_X, *LB_Y + cell_y_index);
 
       for (int line_index = 0; line_index < MCU_sy; line_index += 1)
       {
@@ -100,7 +100,7 @@ void builder ( SOF_section_t SOF_section, uint32_t YV, uint32_t YH,
       }
     }
 
-    LB_X = (LB_X + YH) % NB_MCU_X;
+    *LB_X = (*LB_X + YH) % NB_MCU_X;
 
 #ifdef PROGRESS
     fputs ("\033[1D", stdout);
@@ -108,11 +108,11 @@ void builder ( SOF_section_t SOF_section, uint32_t YV, uint32_t YH,
     fflush (stdout);
 #endif
 
-    if (LB_X == 0)
+    if (*LB_X == 0)
     {
-      LB_Y = (LB_Y + YV) % NB_MCU_Y;
+      *LB_Y = (*LB_Y + YV) % NB_MCU_Y;
 
-      if (LB_Y == 0) 
+      if (*LB_Y == 0) 
       {
         /*
          * TODO: Send the picture to someone !

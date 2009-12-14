@@ -18,39 +18,13 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef DISPATCH_H
-#define DISPATCH_H
+#ifndef SERIALIZER_H
+#define SERIALIZER_H
 
 #include <stdint.h>
 #include <Private/Mjpeg.h>
 #include <KahnProcessNetwork/KahnProcessNetwork.h>
 
-/*
- * Define the thread signature
- */
-
-extern void builder ( SOF_section_t SOF_section, uint32_t YV,
-    uint32_t YH, uint32_t flit_size, uint8_t * MCU_YCbCr,
-    uint8_t * picture, uint32_t * LB_X, uint32_t * LB_Y);
-
-/*
- * Define useful macro to deal with the picture format
- */
-
-#define MCU_INDEX(ptr, index) (ptr + ((index) * MCU_sx * MCU_sy))
-#define MCU_LINE(ptr,n) (ptr + ((n) * MCU_sx))
-
-#define FB_Y_LINE(ptr,n) (ptr + ((n) * MCU_sx * NB_MCU_X))
-#define FB_Y_INDEX(ptr,x,y) \
-  (ptr + ((y) * MCU_sy * MCU_sx * NB_MCU_X) + ((x) * MCU_sx))
-
-#define FB_UV_LINE(ptr,n) (ptr + (((n) * MCU_sx * NB_MCU_X) >> 1))
-#define FB_U_INDEX(ptr,x,y) \
-  (ptr + (((y) * MCU_sy * SOF_section . width) >> 1) +  \
-   (((x) * MCU_sx >> 1)) + (SOF_section . width * SOF_section . height))
-
-#define FB_V_INDEX(ptr,x,y) \
-  (ptr + (((y) * MCU_sy * SOF_section . width >> 1)) + (((x) * MCU_sx >> 1))  \
-   + ((SOF_section . width * SOF_section . height * 3) >> 1))
+extern int32_t serializer (kpn_channel_t c[NB_DECODER + 1]);
 
 #endif

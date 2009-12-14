@@ -5,6 +5,7 @@
 
 #include <Private/Dispatcher.h>
 #include <Private/Decoder.h>
+#include <Private/Serializer.h>
 
 #include <PosixThreads/PosixThreads.h>
 #include <KahnProcessNetwork/KahnProcessNetwork.h>
@@ -13,27 +14,29 @@
 
 int main (void)
 {
-	kpn_channel_t decoder_channel[NB_DECODER][2];
-	kpn_channel_t dispatcher_channel[NB_DECODER + 1];
+  kpn_status_t status;
 
-  pthread_t dispatcher_thread, decoder_thread[NB_DECODER];
+	kpn_channel_t dispatcher_channel[NB_DECODER + 1];
+	kpn_channel_t decoder_channel[NB_DECODER][2];
+	kpn_channel_t serializer_channel[NB_DECODER + 1];
+
+  pthread_t dispatcher_thread, decoder_thread[NB_DECODER],
+            serializer_thread;
 
   /*
    * Create a channel connected to the input movie
    */
 
-	kpn_channel_create ("/devices/fdaccess", 0x10000, & dispatcher_channel[0]);
+	status = kpn_channel_create ("/devices/fdaccess",
+      0x10000, & dispatcher_channel[0]);
   ioctl (dispatcher_channel[0] -> fd, FD_OPEN, "movie.mjpeg");
 
   /*
    * Create a channel connected to the framebuffer 
    */
 
-  for (int32_t i = 0; i < NB_DECODER; i += 1)
-  {
-    kpn_channel_create ("/devices/framebuffer.0", 0, & decoder_channel[i][1]);
-    ioctl (decoder_channel[i][1] -> fd, FB_SET_AUTOREWIND, (void *) true);
-  }
+  kpn_channel_create ("/devices/framebuffer.0", 0, & serializer_channel[0]);
+  ioctl (serializer_channel[0] -> fd, FB_SET_AUTOREWIND, (void *) true);
 
   /*
    * Create the channel between the dispatcher and the decoder
@@ -43,9 +46,13 @@ int main (void)
   {
     char device_name[48];
 
-    sprintf (device_name, "/devices/rdv.%ld", i);
-    kpn_channel_create (device_name, 0x2000, & dispatcher_channel[i + 1]);
-    kpn_channel_create (device_name, 0x2000, & decoder_channel[i][0]);
+    sprintf (device_name, "/devices/rdv.%ld", 2 * i);
+    kpn_channel_create (device_name, 0x3000, & dispatcher_channel[i + 1]);
+    kpn_channel_create (device_name, 0x3000, & decoder_channel[i][0]);
+
+    sprintf (device_name, "/devices/rdv.%ld", 2 * i + 1);
+    kpn_channel_create (device_name, 0, & serializer_channel[i + 1]);
+    kpn_channel_create (device_name, 0, & decoder_channel[i][1]);
   }
 
   /*
@@ -60,6 +67,9 @@ int main (void)
     pthread_create (& decoder_thread[i], NULL,
         (pthread_func_t) decoder, decoder_channel[i]);
   }
+
+  pthread_create (& serializer_thread, NULL,
+      (pthread_func_t) serializer, serializer_channel);
 
   /*
    * Joining the threads altogether
