@@ -56,7 +56,7 @@ int32_t serializer (kpn_channel_t c[NB_DECODER + 1])
     next_decoder = (next_decoder + 1) % NB_DECODER;
 
     cpu_timer_get (0, & new);
-    IPRINTF ("1 frame in %ldd ns\r\n", new - old);
+    IPRINTF ("1 frame in %ld ns\r\n", new - old);
     old = new;
   }
 }
