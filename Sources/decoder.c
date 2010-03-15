@@ -103,9 +103,9 @@ int32_t decoder (kpn_channel_t c[2])
 					IPRINTF("SOF0 marker found\r\n");
 
 					kpn_channel_read (c[0], & SOF_section, sizeof (SOF_section));
-					cpu_data_is_bigendian(16, SOF_section . length);
-					cpu_data_is_bigendian(16, SOF_section . height);
-					cpu_data_is_bigendian(16, SOF_section . width);
+					cpu_data_is_big_endian(16, SOF_section . length);
+					cpu_data_is_big_endian(16, SOF_section . height);
+					cpu_data_is_big_endian(16, SOF_section . width);
 
 					VPRINTF("Data precision = %d\r\n", SOF_section . data_precision);
 					VPRINTF("Image height = %d\r\n", SOF_section . height);
@@ -169,7 +169,7 @@ int32_t decoder (kpn_channel_t c[2])
 					IPRINTF("DHT marker found\r\n");
 
 					kpn_channel_read (c[0], & DHT_section, sizeof (DHT_section));
-					cpu_data_is_bigendian(16, DHT_section . length);
+					cpu_data_is_big_endian(16, DHT_section . length);
 
 					HT_index = DHT_section . huff_info & 0x0f;
 					HT_type = (DHT_section . huff_info >> 4) & 0x01;
@@ -311,7 +311,7 @@ int32_t decoder (kpn_channel_t c[2])
 					IPRINTF("SOS marker found\r\n");
 
 					kpn_channel_read (c[0], & SOS_section, sizeof (SOS_section));
-					cpu_data_is_bigendian(16, SOS_section . length);
+					cpu_data_is_big_endian(16, SOS_section . length);
 
 					kpn_channel_read (c[0], & SOS_component,
               sizeof(SOS_component_t)  * SOS_section . n);
@@ -370,7 +370,7 @@ int32_t decoder (kpn_channel_t c[2])
 					IPRINTF("DQT marker found\r\n");
 
 					kpn_channel_read (c[0], & DQT_section, sizeof (DQT_section));
-					cpu_data_is_bigendian(16, DQT_section . length);
+					cpu_data_is_big_endian(16, DQT_section . length);
 
 					VPRINTF("Quantization precision is %s\r\n",
               ((DQT_section . pre_quant >> 4) & 0x0f) ? "16 bits" :	"8 bits");
@@ -412,9 +412,9 @@ int32_t decoder (kpn_channel_t c[2])
 					IPRINTF("APP0 marker found\r\n");
 
 					kpn_channel_read (c[0], & jfif_header, sizeof (jfif_header));
-					cpu_data_is_bigendian(16, jfif_header.length);
-					cpu_data_is_bigendian(16, jfif_header.xdensity);
-					cpu_data_is_bigendian(16, jfif_header.ydensity);
+					cpu_data_is_big_endian(16, jfif_header.length);
+					cpu_data_is_big_endian(16, jfif_header.xdensity);
+					cpu_data_is_big_endian(16, jfif_header.ydensity);
 
 					if (jfif_header.identifier[0] != 'J' ||
               jfif_header.identifier[1] != 'F' ||

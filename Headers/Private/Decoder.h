@@ -53,7 +53,7 @@ static inline void skip_segment (kpn_channel_t channel)
 
 	kpn_channel_read (channel, & u . size[0], 1);
 	kpn_channel_read (channel, & u . size[1], 1);
-	cpu_data_is_bigendian (16, u . segment_size);
+	cpu_data_is_big_endian (16, u . segment_size);
 
 	IPRINTF("Skip segment (%d data)\r\n",(unsigned int) u . segment_size);
 	kpn_channel_skip (channel, u . segment_size - 2); 
