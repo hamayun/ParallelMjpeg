@@ -65,11 +65,11 @@ SECTIONS
 		OS_DRIVERS_LIST = .; LONG(soclib_platform_module) LONG(rdv_module)
                          LONG(fdaccess_module) LONG(soclib_fb_module)
 		
-		OS_N_FILESYSTEMS = .; LONG(0x3)
+		OS_N_FILESYSTEMS = .; LONG(0x2)
 		OS_FILESYSTEMS_LIST = .; LONG(devfs_module) LONG(rootfs_module)
 
-		OS_N_MODULES = .; LONG(0x3)
-		OS_MODULES_LIST = .; LONG(devfs_module) LONG(rootfs_module)
+		OS_N_MODULES = .; LONG(0x0)
+		OS_MODULES_LIST = .; 
 
 		OS_THREAD_STACK_SIZE = .; LONG(0x8000)
 
