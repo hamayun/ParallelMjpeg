@@ -31,7 +31,7 @@ int main (void)
 
   if (status == KPN_NO_ENTRY)
   {
-    printf ("Cannot open source file.\r\n");
+    printf ("Error: Cannot open source file.\r\n");
     abort ();
   }
 
@@ -39,7 +39,14 @@ int main (void)
    * Create a channel connected to the framebuffer 
    */
 
-  kpn_channel_create ("/devices/framebuffer.0", 0, & serializer_channel[0]);
+  kpn_channel_create ("/devices/video/simulator/0", 0, & serializer_channel[0]);
+
+  if (status == KPN_NO_ENTRY)
+  {
+    printf ("Error: Cannot open framebuffer.\r\n");
+    abort ();
+  }
+
   ioctl (serializer_channel[0] -> fd, FB_SET_AUTOREWIND, (void *) true);
 
   /*
