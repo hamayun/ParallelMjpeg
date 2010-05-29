@@ -1,27 +1,12 @@
 #!/bin/bash
 
-#
-# Configuration
-#
+export APES_CC_FLAGS="-Wall -Werror -Wno-format -std=c99"
+export MJPEG_CC_FLAGS="-DNB_DECODER=2 -DDISPATCH_TIME -DINFO -DVERBOSE"
 
-export TARGET_CFLAGS="-Wall -Werror -Wno-format -std=c99"
+APES_CC_OPTIMIZATIONS="-g -mlittle-endian -O3 -mfpu=fpa -march=armv6"
+APES_CC_OPTIMIZATIONS+=" -DDNA_ENABLE_LOG=INFO_LEVEL"
+export APES_CC_OPTIMIZATIONS
 
-TARGET_COPTS="-g -mlittle-endian -O3 -mfpu=fpa -march=armv6"
-TARGET_COPTS+=" -DNB_DECODER=2 -DDISPATCH_TIME -DINFO"
-TARGET_COPTS+=" -DDNA_ENABLE_LOG=INFO_LEVEL"
-export TARGET_COPTS
-
-export TARGET_CC="arm-sls-dnaos-gcc"
-export TARGET_LD="arm-sls-dnaos-gcc"
-export TARGET_LDFLAGS="-mfpu=fpa -mlittle-endian -march=armv6 -T$PWD/ldscript"
-
-#
-# Display information
-#
-
-echo "[Tool Chain settings]"
-echo "| CC       : ${TARGET_CC}"
-echo "| CFLAGS   : ${TARGET_CFLAGS}"
-echo "| COPTS    : ${TARGET_COPTS}"
-echo "| LD       : ${TARGET_LD}"
-echo "| LDFLAGS  : ${TARGET_LDFLAGS}"
+export APES_COMPILER="arm-sls-dnaos-gcc"
+export APES_LINKER="arm-sls-dnaos-gcc"
+export APES_LINKER_FLAGS="-mfpu=fpa -mlittle-endian -march=armv6 -T$PWD/ldscript"
