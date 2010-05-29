@@ -57,11 +57,11 @@ int main (void)
   {
     char device_name[48];
 
-    sprintf (device_name, "/devices/rdv.%ld", 2 * i);
+    sprintf (device_name, "/devices/channel/rendezvous/%ld", 2 * i);
     kpn_channel_create (device_name, 0x3000, & dispatcher_channel[i + 1]);
     kpn_channel_create (device_name, 0x3000, & decoder_channel[i][0]);
 
-    sprintf (device_name, "/devices/rdv.%ld", 2 * i + 1);
+    sprintf (device_name, "/devices/channel/rendezvous/%ld", i + 1);
     kpn_channel_create (device_name, 0, & serializer_channel[i + 1]);
     kpn_channel_create (device_name, 0, & decoder_channel[i][1]);
   }
