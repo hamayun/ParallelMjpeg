@@ -9,7 +9,6 @@
 
 #include <PosixThreads/PosixThreads.h>
 #include <KahnProcessNetwork/KahnProcessNetwork.h>
-#include <SoclibHostAccess/SoclibHostAccess.h>
 #include <SoclibFramebuffer/SoclibFramebuffer.h>
 
 int main (void)
@@ -27,9 +26,14 @@ int main (void)
    * Create a channel connected to the input movie
    */
 
-	status = kpn_channel_create ("/devices/fdaccess",
+	status = kpn_channel_create ("/devices/disk/simulator/0/0",
       0x10000, & dispatcher_channel[0]);
-  ioctl (dispatcher_channel[0] -> fd, FD_OPEN, "movie.mjpeg");
+
+  if (status == KPN_NO_ENTRY)
+  {
+    printf ("Cannot open source file.\r\n");
+    abort ();
+  }
 
   /*
    * Create a channel connected to the framebuffer 
