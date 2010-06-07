@@ -9,7 +9,7 @@
 
 #include <PosixThreads/PosixThreads.h>
 #include <KahnProcessNetwork/KahnProcessNetwork.h>
-#include <SoclibFramebuffer/SoclibFramebuffer.h>
+#include <SoclibFramebufferDriver/Driver.h>
 
 int main (void)
 {
