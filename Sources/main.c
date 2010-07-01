@@ -26,7 +26,7 @@ int main (void)
    * Create a channel connected to the input movie
    */
 
-	status = kpn_channel_create ("/devices/disk/simulator/0/0",
+	status = kpn_channel_create ("/devices/disk/simulator/0",
       0x10000, & dispatcher_channel[0]);
 
   if (status == KPN_NO_ENTRY)
@@ -70,15 +70,18 @@ int main (void)
    * Create the threads
    */
 
+  printf ("Create dispatcher thread.\r\n");
   pthread_create (& dispatcher_thread, NULL,
       (pthread_func_t) dispatcher, dispatcher_channel);
 
   for (int32_t i = 0; i < NB_DECODER; i += 1)
   {
+    printf ("Create decoder thread %ld.\r\n", i);
     pthread_create (& decoder_thread[i], NULL,
         (pthread_func_t) decoder, decoder_channel[i]);
   }
 
+  printf ("Create serializer thread.\r\n");
   pthread_create (& serializer_thread, NULL,
       (pthread_func_t) serializer, serializer_channel);
 
