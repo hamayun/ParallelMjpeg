@@ -35,7 +35,10 @@ int32_t serializer (kpn_channel_t c[NB_DECODER + 1])
 {
   uint8_t * buffer = 0;
   int32_t next_decoder = 0;
+
+#ifdef SHOW_TIME
   bigtime_t old, new;
+#endif
 
   /*
    * Allocate a dummy sized buffer
@@ -47,7 +50,9 @@ int32_t serializer (kpn_channel_t c[NB_DECODER + 1])
    * Parse the flows
    */
 
+#ifdef SHOW_TIME
   cpu_timer_get (0, & old);
+#endif
 
   while (true)
   {
@@ -55,9 +60,11 @@ int32_t serializer (kpn_channel_t c[NB_DECODER + 1])
     kpn_channel_write (c[0], buffer, 256 * 144 * 2);
     next_decoder = (next_decoder + 1) % NB_DECODER;
 
+#ifdef SHOW_TIME
     cpu_timer_get (0, & new);
     IPRINTF ("1 frame in %ld ns\r\n", new - old);
     old = new;
+#endif
   }
 }
 
