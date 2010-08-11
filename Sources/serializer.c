@@ -62,7 +62,7 @@ int32_t serializer (kpn_channel_t c[NB_DECODER + 1])
 
 #ifdef SHOW_TIME
     cpu_timer_get (0, & new);
-    IPRINTF ("1 frame in %ld ns\r\n", new - old);
+    printf ("1 frame in %ld ns\r\n", new - old);
     old = new;
 #endif
   }
