@@ -113,6 +113,6 @@ SECTIONS
 
 	.kheap ALIGN(0x8) : {} > text :heap
 
-	.uheap ALIGN(0x8) + 0x100000: {} > text :heap
+	.uheap ALIGN(0x8) + 0x100000: { _end = .;} > text :heap
 }
 
