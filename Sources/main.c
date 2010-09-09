@@ -26,7 +26,7 @@ int main (void)
    * Create a channel connected to the input movie
    */
 
-	status = kpn_channel_create ("/devices/disk/simulator/0",
+	status = kpn_channel_create ("/devices/disk/simulator/0/0",
       0x10000, & dispatcher_channel[0]);
 
   if (status == KPN_NO_ENTRY)
