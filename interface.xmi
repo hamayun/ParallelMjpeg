@@ -15,6 +15,7 @@
     <id name="SoclibPlatformDriver" version="1.0"/>
     <id name="SoclibFramebufferDriver" version="1.0"/>
     <id name="SoclibHostAccessDriver" version="1.0"/>
+    <id name="SoclibTgDriver" version="1.0"/>
     <id name="RendezVousChannelDriver" version="1.0"/>
     <id name="DeviceFileSystem" version="1.0"/>
     <id name="RootFileSystem" version="1.0"/>
@@ -22,7 +23,7 @@
   </inject>
 
   <restrict>
-    <id name="NativeProcessor" version="1.0"/>
+    <id name="x86Processor" version="1.0"/>
     <id name="DnaCore" version="1.0"/>
     <id name="DnaMM_WorstFit" version="1.0"/>
     <id name="PosixThreadsLibrary" version="1.0"/>
