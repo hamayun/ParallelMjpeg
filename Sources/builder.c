@@ -33,7 +33,6 @@ void builder ( SOF_section_t SOF_section, uint32_t YV, uint32_t YH,
 	uint16_t NB_MCU_X = 0, NB_MCU_Y = 0;
 	uint16_t NB_CELLS = 0;
 
-	uint32_t flit_bytes = 0;
 	uint32_t * y_line_dst = NULL, * y_line_src = NULL;
 
 #ifdef PROGRESS
@@ -42,7 +41,6 @@ void builder ( SOF_section_t SOF_section, uint32_t YV, uint32_t YH,
 	uint32_t block_index = 0;
 #endif
 
-	flit_bytes = flit_size * MCU_sx * MCU_sy * sizeof (uint8_t);
 	NB_MCU_X = intceil(SOF_section.width, MCU_sx);
 	NB_MCU_Y = intceil(SOF_section.height, MCU_sy);
 	NB_CELLS = YV * YH + 2;

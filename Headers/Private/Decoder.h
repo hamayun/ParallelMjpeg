@@ -63,7 +63,7 @@ static inline void load_huffman_table (kpn_channel_t channel,
     DHT_section_t *DHT_section, huff_table_t * ht)
 {
 	uint8_t buffer = 0;
-	int32_t size = 0, max = 0;
+	int32_t max = 0;
 	int32_t LeavesN = 0, LeavesT = 0, i = 0;
 	int32_t AuxCode = 0;
 
@@ -78,7 +78,6 @@ static inline void load_huffman_table (kpn_channel_t channel,
 		LeavesT += LeavesN;
 	}
 
-	size = DHT_section -> length - 2 - 1 - 16;
 	if (LeavesT > MAX_SIZE((DHT_section -> huff_info & 0x10)))
   {
 		max = MAX_SIZE((DHT_section -> huff_info & 0x10));
