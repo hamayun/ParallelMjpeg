@@ -75,6 +75,8 @@ SECTIONS
 		PLATFORM_AICU_BASE = .; LONG(0x0) LONG(0x0) LONG(0x0) LONG(0x0) LONG(0x0) LONG(0x0) LONG(0x0) LONG(0x0)
 		EXTFIFO_CHANNEL_NDEV = .; LONG(0x0)
 		EXTFIFO_CHANNELS_PTR = .; LONG(0x0)
+
+		HOSTTIME_BASEPORT    = .; SHORT(0x5000)
 	} > mem :data
 
     .rodata ALIGN(16) : { *(.rodata) *(.rodata.str1.*) *(.rodata.cst*) *(.rodata.str2.*) } > mem :data
