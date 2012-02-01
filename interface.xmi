@@ -19,7 +19,6 @@
     <id name="RendezVousChannelDriver" version="1.0"/>
     <id name="DeviceFileSystem" version="1.0"/>
     <id name="RootFileSystem" version="1.0"/>
-	<id name="ExtFifoDriver" version="1.0"/>
   </inject>
 
   <restrict>
