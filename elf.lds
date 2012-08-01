@@ -19,11 +19,13 @@ PHDRS
 
 SECTIONS
 {
-	.init 0x00100000: { stext = .; *(.init) } > mem :text
+	.init 0x0100000: { stext = .; *(.init) } > mem :text
 	.text ALIGN(8): { *(.text) *(.text.*) } > mem :text
 	.fini ALIGN(8): { *(.fini*) } > mem :text
     
-	.data ALIGN(4K) : { *(.data) *(.glue_7*) *(.eh_frame*) } > mem :data
+	/* .data ALIGN(4K) : { *(.data) *(.glue_7*) *(.eh_frame*) } > mem :data */
+	.data ALIGN(0x8) : { *(.data*) *(.glue_7*) *(.eh_frame*) /home/hamayun/workspace/NaSiK/sw/apes-components/boot/secondary/bin/inc_secondary.o } > mem :data
+
 	.os_config ALIGN(0x8): {
 		OS_N_DRIVERS = .; LONG(0x5)
 		OS_DRIVERS_LIST = .; LONG(soclib_platform_module) LONG(rdv_module)
@@ -46,10 +48,9 @@ SECTIONS
 	} > mem :data
 	.hal ALIGN(0x8): {
 		PLATFORM_DEBUG_CHARPORT = .; LONG(0xC0000000)
-		APP_ENTRY_POINT = .; LONG(main);
+		APP_ENTRY_POINT = .; LONG(_main);
 
-		CPU_MIPS32_COUNT = .; LONG(0x2)
-		CPU_SVC_STACK_ADDR  = ABSOLUTE(ADDR(.sysstack));
+		CPU_SVC_STACK_ADDR  = .; LONG(ADDR(.sysstack));
 
 		CPU_BSS_START = .; LONG(ADDR(.bss))
 		CPU_BSS_END = .; LONG(__hal_bss_end)
