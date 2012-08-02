@@ -1,7 +1,7 @@
 
 MEMORY
 {
-	mem :    ORIGIN = 1M,    LENGTH = 30M
+	mem :    ORIGIN = 0M,    LENGTH = 256M
 }
 
 PHDRS
@@ -39,7 +39,7 @@ SECTIONS
 		OS_THREAD_STACK_SIZE = .; LONG(0x8000)
 
 		OS_KERNEL_HEAP_ADDRESS = .; LONG(ADDR(.kheap))
-		OS_KERNEL_HEAP_SIZE = .; LONG(0x100000)
+		OS_KERNEL_HEAP_SIZE = .; LONG(0x1000000)
 
 		OS_USER_HEAP_ADDRESS = .; LONG(ADDR(.uheap))
 		OS_EXTENSIONS_LIST = .; LONG(0x0)
@@ -89,7 +89,7 @@ SECTIONS
 
 	.kheap ALIGN(0x8) : {} > mem :heap
 
-	.uheap ALIGN(0x8) + 0x100000: {_end = .;}  > mem :heap
+	.uheap ALIGN(0x8) + 0x1000000: {_end = .;}  > mem :heap
 
 	edata = .;
 
