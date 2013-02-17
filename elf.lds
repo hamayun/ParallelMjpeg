@@ -59,17 +59,17 @@ SECTIONS
 		CPU_BSS_START = .; LONG(ADDR(.bss))
 		CPU_BSS_END = .; LONG(__hal_bss_end)
 
+		i8259_VECTOR_OFFSET = .; LONG(0x20)
+		IO_APIC_VECTOR_OFFSET = .; LONG(0x80)
+
 		PLATFORM_TIMER_INTN = .; LONG (2)
 		PLATFORM_TIMER_BASE = .; LONG(0xC1000000)
 
 		PLATFORM_IPI_INTN = .; LONG(7)
 		PLATFORM_IPI_BASE = .; LONG(0xC2000000)
 
-		i8259_VECTOR_OFFSET = .; LONG(0x20)
-		IO_APIC_VECTOR_OFFSET = .; LONG(0x80)
-
 		SOCLIB_TTY_NDEV = .; LONG(0x1)
-		SOCLIB_TTY_DEVICES = .; LONG(5) LONG(0XC0000000)
+		SOCLIB_TTY_DEVICES = .; LONG(0x25) LONG(0XC0000000) /* i8259_VECTOR_OFFSET + 5 is the IRQ Number */
 
 		SOCLIB_FB_NDEV = .; LONG(0x1)
         /* Important: If in SystemC Framebuffer Component, the base address is 0XC4000000; we have to add an offset of 0x1000 here */
