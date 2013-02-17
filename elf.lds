@@ -19,11 +19,16 @@ PHDRS
 
 SECTIONS
 {
-	.init 0x0100000: { stext = .; *(.init) } > mem :text
+	gdtdesc = 0x1000;
+	gdt = 0x1000;
+	idtdesc = 0x1100;
+	idt = 0x1110;
+
+	.init 0x0100000: { stext = .; *(.reset) } > mem :text
 	.text ALIGN(8): { *(.text) *(.text.*) } > mem :text
 	.fini ALIGN(8): { *(.fini*) } > mem :text
     
-	.data ALIGN(0x8) : { *(.data*) *(.glue_7*) *(.eh_frame*) /home/hamayun/workspace/NaSiK/sw/apes-components/KVMx86BootLoader/Secondary/bin/KVMx86SecondaryBoot.o } > mem :data
+	.data ALIGN(0x8) : { *(.data*) *(.glue_7*) *(.eh_frame*) ../../../sw/apes-components/KVMx86BootLoader/Secondary/bin/KVMx86SecondaryBoot.o } > mem :data
 
 	.os_config ALIGN(0x8): {
 		OS_N_DRIVERS = .; LONG(0x5)
@@ -49,7 +54,7 @@ SECTIONS
 		PLATFORM_DEBUG_CHARPORT = .; LONG(0xC0000000)
 		APP_ENTRY_POINT = .; LONG(_main);
 
-		CPU_SVC_STACK_ADDR  = .; LONG(ADDR(.sysstack));
+		CPU_SYS_STACK_ADDR  = .; LONG(ADDR(.sysstack));
 
 		CPU_BSS_START = .; LONG(ADDR(.bss))
 		CPU_BSS_END = .; LONG(__hal_bss_end)
@@ -60,8 +65,11 @@ SECTIONS
 		PLATFORM_IPI_INTN = .; LONG(7)
 		PLATFORM_IPI_BASE = .; LONG(0xC2000000)
 
+		i8259_VECTOR_OFFSET = .; LONG(0x20)
+		IO_APIC_VECTOR_OFFSET = .; LONG(0x80)
+
 		SOCLIB_TTY_NDEV = .; LONG(0x1)
-		SOCLIB_TTY_DEVICES = .; LONG(3) LONG(0XC0000000)
+		SOCLIB_TTY_DEVICES = .; LONG(5) LONG(0XC0000000)
 
 		SOCLIB_FB_NDEV = .; LONG(0x1)
         /* Important: If in SystemC Framebuffer Component, the base address is 0XC4000000; we have to add an offset of 0x1000 here */
