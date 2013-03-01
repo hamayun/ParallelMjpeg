@@ -42,6 +42,8 @@ int32_t dispatcher (kpn_channel_t c[NB_DECODER + 1])
 
   while (true)
   {
+	printf("DISPATCHER\n");
+
     kpn_channel_read (c[0], & marker0, 1);
 
     if (marker0 == M_SMS)

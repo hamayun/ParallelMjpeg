@@ -48,9 +48,12 @@ const uint8_t G_ZZ[64] =
  * The MJPEG decoder function
  */
 
+int global_decoder_id = 0;
+
 int32_t decoder (kpn_channel_t c[2])
 {
 	bool dispatch_info = true;
+	int decoder_id = global_decoder_id++;
 
 	uint8_t marker[2], HT_type = 0, HT_index = 0;
 	uint8_t DQT_table[4][64], index = 0, QT_index = 0;
@@ -93,6 +96,8 @@ int32_t decoder (kpn_channel_t c[2])
 
 	while (1) 
   {
+	printf("DECODER-%d\n", decoder_id);
+
     kpn_channel_read (c[0], marker, 2);
 
 		if (marker[0] == M_SMS)

@@ -56,6 +56,8 @@ int32_t serializer (kpn_channel_t c[NB_DECODER + 1])
 
   while (true)
   {
+	printf("SERIALIZER\n");
+
     kpn_channel_read (c[next_decoder + 1], buffer, 256 * 144 * 2);
     kpn_channel_write (c[0], buffer, 256 * 144 * 2);
     next_decoder = (next_decoder + 1) % NB_DECODER;
