@@ -22,6 +22,22 @@ int main (void)
   pthread_t dispatcher_thread, decoder_thread[NB_DECODER],
             serializer_thread;
 
+	
+	int i = 0;
+	char *ptr = 0xC0000004;
+	*ptr = 0x35;
+
+	char ch = 0x0;
+	while((ch = *ptr) == 0x35)
+	{
+	    printf(".");
+	}
+	
+	printf("Char READ = 0x%X\n", (char) ch);
+
+//	for (; i < 100; i++)
+//		*ptr = 'Z';
+
   /*
    * Create a channel connected to the input movie
    */
