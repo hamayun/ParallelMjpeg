@@ -10,10 +10,12 @@
 #include <PosixThreads/PosixThreads.h>
 #include <KahnProcessNetwork/KahnProcessNetwork.h>
 #include <SoclibFramebufferDriver/Driver.h>
+#include <Processor/Profile.h>
 
 int main (void)
 {
   kpn_status_t status;
+  CPU_PROFILE_COMP_START();
 
 	kpn_channel_t dispatcher_channel[NB_DECODER + 1];
 	kpn_channel_t decoder_channel[NB_DECODER][2];

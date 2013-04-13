@@ -26,6 +26,7 @@
 
 #include <Private/Serializer.h>
 #include <Processor/Processor.h>
+#include <Processor/Profile.h>
 
 /*
  * The serializer function
@@ -35,6 +36,7 @@ int32_t serializer (kpn_channel_t c[NB_DECODER + 1])
 {
   uint8_t * buffer = 0;
   int32_t next_decoder = 0;
+  int count = 1;
 
 #ifdef SHOW_TIME
   bigtime_t old, new;
@@ -59,6 +61,13 @@ int32_t serializer (kpn_channel_t c[NB_DECODER + 1])
     kpn_channel_read (c[next_decoder + 1], buffer, 256 * 144 * 2);
     kpn_channel_write (c[0], buffer, 256 * 144 * 2);
     next_decoder = (next_decoder + 1) % NB_DECODER;
+
+    if(count == 100)
+    {
+      CPU_PROFILE_COMP_END();
+      CPU_PROFILE_FLUSH_DATA();
+    }
+    dna_printf("Decoded Frame # %d\n", count++);
 
 #ifdef SHOW_TIME
     cpu_timer_get (0, & new);
